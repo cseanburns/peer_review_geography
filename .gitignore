@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+geography.Rproj
+author_decisions.csv
+decisions-2.csv
+decisions.csv
+plots/
+archived_data/
+exploratory_plots/
+old-papers/
