@@ -1,3 +1,5 @@
+source("libraries.R")
+
 dec_language <- select(dec0,msID, firstAuthGeog, paperRejected)
 auth_language <- select(author_decisions, msid, author_order, english) %>% filter(author_order == 1)
 
