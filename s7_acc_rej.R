@@ -55,8 +55,6 @@ ggplot(decisions4, aes(x = firstAuthGeog, fill = paperRejected)) +
 #         xlab("Paper Rejected") +
 #         ylab("Count")
 
-
-
 # acceptance rates for same and international collaborations (first and senior author):
 
 # x = Yes : paper is rejected

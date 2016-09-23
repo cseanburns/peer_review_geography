@@ -28,13 +28,6 @@ dec0$prob <- prob
 g <- roc(paperRejected ~ prob, data = dec0) ; g
 plot(g)
 
-
-
-
-
-
-
-
 ggplot(decisions3, aes(x = paperRejected, y = timeToDecision)) +
         geom_boxplot() + theme_bw() +
         xlab("Paper Rejected") +
