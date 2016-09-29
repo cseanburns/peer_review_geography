@@ -1,16 +1,15 @@
 source("libraries.R")
 
 # demographics of authors
-# countries, regions, languages, HDI
-# for first authors, last authors, and interactions between first and last
-# authors
+# countries, regions, languages, HDI for
+# first authors, last authors, and interactions between first and last authors
 
-first_author_tbl_1 <- table(dec$firstAuthGeog)
-first_author_tbl_2 <- round(table(dec$firstAuthGeog) / sum(table(dec$firstAuthGeog)),4) * 100
+first_author_tbl_1 <- table(dec$first_auth_geog)
+first_author_tbl_2 <- round(table(dec$first_auth_geog) / sum(table(dec$first_auth_geog)),4) * 100
 first_author_tbl_1 ; first_author_tbl_2
 
-senior_author_tbl_1 <- table(dec$seniorAuthGeog)
-senior_author_tbl_2 <- round(table(dec$seniorAuthGeog) / sum(table(dec$seniorAuthGeog)),4) * 100
+senior_author_tbl_1 <- table(dec$senior_auth_geog)
+senior_author_tbl_2 <- round(table(dec$senior_auth_geog) / sum(table(dec$senior_auth_geog)),4) * 100
 senior_author_tbl_1 ; senior_author_tbl_2
 
 chisq.test(first_author_tbl_1, senior_author_tbl_2, simulate.p.value = TRUE)
@@ -18,21 +17,21 @@ chisq.test(first_author_tbl_1, senior_author_tbl_2, simulate.p.value = TRUE)
 rm(first_author_tbl_1, first_author_tbl_2,
    senior_author_tbl_1, senior_author_tbl_2)
 
-first_senior_author_tbl_1 <- table(dec$firstAuthGeog, dec$seniorAuthGeog)
+first_senior_author_tbl_1 <- table(dec$first_auth_geog, dec$senior_auth_geog)
 first_senior_author_tbl_2 <- round(first_senior_author_tbl_1 /
                                            rowSums(first_senior_author_tbl_1),3)
 first_senior_author_tbl_3 <- data.frame(round(first_senior_author_tbl_1 /
                                                       rowSums(first_senior_author_tbl_1),3))
-names(first_senior_author_tbl_3) <- c("FirstAuthor", "SeniorAuthor", "Proportion")
+names(first_senior_author_tbl_3) <- c("First_Author", "Senior_Author", "Proportion")
 assocstats(first_senior_author_tbl_3)
 
-first_senior_author_tbl_4 <- table(dec$seniorAuthGeog, dec$firstAuthGeog)
+first_senior_author_tbl_4 <- table(dec$senior_auth_geog, dec$first_auth_geog)
 first_senior_author_tbl_5 <- round(first_senior_author_tbl_4 /
                                            rowSums(first_senior_author_tbl_4),3)
 first_senior_author_tbl_6 <- data.frame(round(first_senior_author_tbl_5 /
                                                       rowSums(first_senior_author_tbl_5),3))
 
-names(first_senior_author_tbl_6) <- c("SeniorAuthor", "FirstAuthor", "Proportion")
+names(first_senior_author_tbl_6) <- c("Senior_Author", "First_Author", "Proportion")
 assocstats(first_senior_author_tbl_6)
 
 rm(first_senior_author_tbl_1,
@@ -42,16 +41,16 @@ rm(first_senior_author_tbl_1,
    first_senior_author_tbl_5,
    first_senior_author_tbl_6)
 
-dec_scores        <- select(dec, msID, meanReviewScore, paperRejected)
-names(dec_scores) <- c("msid", "mean_review", "paper_rejected")
+dec_scores        <- select(dec, ms_id, mean_review_score, paper_rejected)
+names(dec_scores) <- c("ms_id", "mean_review", "paper_rejected")
 dec_review        <- inner_join(author_decisions,
                                 dec_scores,
-                                by = "msid")
+                                by = "ms_id")
+
+rm(dec_scores)
 
 dec_review$submit_month        <- NULL
 dec_review$author_institution  <- NULL
-dec_review$author_country.1    <- NULL
-dec_review$geographic_region.1 <- NULL
 
 dec_review$submit_date <- format(dec_review$submit_date,
                                  format = "%m/%d/%Y")
@@ -71,7 +70,7 @@ mp       <- ggplot() + mapWorld
 mp + geom_point(data =countryid,
                 aes(x = lon, y = lat)) + theme_bw()
 
-ad2 <- melt(dec_review, id.vars = c("msid",
+ad2 <- melt(dec_review, id.vars = c("ms_id",
                                     "author_order",
                                     "author_country"))
 
@@ -94,10 +93,10 @@ last_author  <- last_author %>% inner_join(countryid)
 last_author  <- data.frame(last_author)
 
 ad4          <- inner_join(first_author, last_author, by = "msid")
-names(ad4)   <- c("msid", "first_author", "lon_fa", "lat_fa", "last_author", "lon_la", "lat_la")
+names(ad4)   <- c("ms_id", "first_author", "lon_fa", "lat_fa", "last_author", "lon_la", "lat_la")
 head(ad4)
 
-ad5          <- ad4[,-1] # remove msid column
+ad5          <- ad4[,-1] # remove ms_id column
 head(ad5)
 ad5b <- select(ad5, first_author, last_author)
 plot(graph_from_data_frame(ad5b))
