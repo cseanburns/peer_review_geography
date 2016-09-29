@@ -1,11 +1,9 @@
 source("libraries.R")
 
-decisions <- read.csv("~/Dropbox/workspace/geography/decisions-2.csv")
-
-dec <- decisions
+dec <- read.csv("decisions-2.csv")
 
 # create submission year variable
-dec$submitYear <- substr(dec$msID, 1, 4)
+dec$submitYear <- substr(dec$ms_id, 1, 4)
 dec$submitYear <- as.numeric(dec$submitYear)
 
 dec <- select(dec, msID, firstAuthGeog, corrAuthGeog, submitAuthGeog,
@@ -40,20 +38,10 @@ dec$noReviewersResponded    <- imputed$noReviewersResponded
 dec$timeToDecision          <- imputed$timeToDecision
 dec$paperRejected           <- imputed$paperRejected
 
-
 ##### Decisions Data #####
 
 # convert to factors
 dec$firstAuthGeog      <- factor(dec$firstAuthGeog,
-                                 ordered = FALSE)
-
-dec$corrAuthGeog       <- factor(dec$corrAuthGeog,
-                                 ordered = FALSE)
-
-dec$submitAuthGeog     <- factor(dec$submitAuthGeog,
-                                 ordered = FALSE)
-
-dec$seniorAuthGeog     <- factor(dec$seniorAuthGeog,
                                  ordered = FALSE)
 
 dec$handlingEditorGeog <- factor(dec$handlingEditorGeog,
@@ -76,13 +64,13 @@ dec$paperRejected      <- factor(dec$paperRejected, # NOTE reverse order
 # Keep only firstAuthGeog since this is highly correlated with corrAuthGeog, submitAuthGeog, seniorAuthGeog
 # Keep only noReviewersObtained since this is highly correlated with NoReviewersResponded
 
-dec0 <- select(dec, -corrAuthGeog, -submitAuthGeog, -seniorAuthGeog, -noReviewersResponded)
+dec <- select(dec, -corrAuthGeog, -submitAuthGeog, -seniorAuthGeog, -noReviewersResponded)
 
 rm(simple, imputed, decisions)
 
 ### Additional decisions data #### 
 
-author_decisions <- read.csv("~/Dropbox/workspace/geography/author_decisions.csv")
+author_decisions <- read.csv("author_decisions.csv")
 
 author_decisions$corresponding_author <- factor(author_decisions$corresponding_author,
                                                 levels = c("2", "0", "1"),

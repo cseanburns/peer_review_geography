@@ -5,32 +5,44 @@ source("libraries.R")
 # for first authors, last authors, and interactions between first and last
 # authors
 
-fa1 <- table(dec0$firstAuthGeog)
-fa2 <- round(table(dec0$firstAuthGeog) / sum(table(dec0$firstAuthGeog)),4) * 100
-fa1;fa2
+first_author_tbl_1 <- table(dec$firstAuthGeog)
+first_author_tbl_2 <- round(table(dec$firstAuthGeog) / sum(table(dec$firstAuthGeog)),4) * 100
+first_author_tbl_1 ; first_author_tbl_2
 
-sa1 <- table(dec0$seniorAuthGeog)
-sa2 <- round(table(dec0$seniorAuthGeog) / sum(table(dec0$seniorAuthGeog)),4) * 100
-sa1;sa2
+senior_author_tbl_1 <- table(dec$seniorAuthGeog)
+senior_author_tbl_2 <- round(table(dec$seniorAuthGeog) / sum(table(dec$seniorAuthGeog)),4) * 100
+senior_author_tbl_1 ; senior_author_tbl_2
 
-chisq.test(fa1,sa1, simulate.p.value = TRUE)
-rm(fa1, fa2, sa1, sa2)
+chisq.test(first_author_tbl_1, senior_author_tbl_2, simulate.p.value = TRUE)
 
-fasa1 <- table(decisions$firstAuthGeog, decisions$seniorAuthGeog)
-fasa2 <- round(fasa1 / rowSums(fasa1),3)
-fasa3 <- data.frame(round(fasa1 / rowSums(fasa1),3))
-names(fasa3) <- c("FirstAuthor", "SeniorAuthor", "Proportion")
-assocstats(fasa1)
+rm(first_author_tbl_1, first_author_tbl_2,
+   senior_author_tbl_1, senior_author_tbl_2)
 
-fasa4 <- table(decisions$seniorAuthGeog, decisions$firstAuthGeog)
-fasa5 <- round(fasa4 / rowSums(fasa4),3)
-fasa6 <- data.frame(round(fasa5 / rowSums(fasa5),3))
-names(fasa6) <- c("SeniorAuthor", "FirstAuthor", "Proportion")
-assocstats(fasa4)
+first_senior_author_tbl_1 <- table(dec$firstAuthGeog, dec$seniorAuthGeog)
+first_senior_author_tbl_2 <- round(first_senior_author_tbl_1 /
+                                           rowSums(first_senior_author_tbl_1),3)
+first_senior_author_tbl_3 <- data.frame(round(first_senior_author_tbl_1 /
+                                                      rowSums(first_senior_author_tbl_1),3))
+names(first_senior_author_tbl_3) <- c("FirstAuthor", "SeniorAuthor", "Proportion")
+assocstats(first_senior_author_tbl_3)
 
-rm(fasa1, fasa2, fasa3, fasa4, fasa5, fasa6)
+first_senior_author_tbl_4 <- table(dec$seniorAuthGeog, dec$firstAuthGeog)
+first_senior_author_tbl_5 <- round(first_senior_author_tbl_4 /
+                                           rowSums(first_senior_author_tbl_4),3)
+first_senior_author_tbl_6 <- data.frame(round(first_senior_author_tbl_5 /
+                                                      rowSums(first_senior_author_tbl_5),3))
 
-dec_scores        <- select(decisions, msID, meanReviewScore, paperRejected)
+names(first_senior_author_tbl_6) <- c("SeniorAuthor", "FirstAuthor", "Proportion")
+assocstats(first_senior_author_tbl_6)
+
+rm(first_senior_author_tbl_1,
+   first_senior_author_tbl_2,
+   first_senior_author_tbl_3,
+   first_senior_author_tbl_4,
+   first_senior_author_tbl_5,
+   first_senior_author_tbl_6)
+
+dec_scores        <- select(dec, msID, meanReviewScore, paperRejected)
 names(dec_scores) <- c("msid", "mean_review", "paper_rejected")
 dec_review        <- inner_join(author_decisions,
                                 dec_scores,
@@ -254,7 +266,7 @@ ggplot(firstSenior, aes(x = Var1,
 # Submitting author is first author, ergo is different than last author,
 # which we assume to be the senior author.
 
-decisions %>%
+dec %>%
         filter(submitAuthFirstAuth == "Yes") %>%
         filter(authorCount > 1) %>%
         select(firstAuthGeog, seniorAuthGeog) %>%
