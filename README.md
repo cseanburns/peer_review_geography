@@ -8,7 +8,8 @@ publication.
 ## Data files: decisions.csv and decisions_2.csv
 
 - decisons.csv is the original file
-- decisions_2.csv has been lightly cleaned in LibreOffice Calc
+- decisions_2.csv is a copy of the above but has been lightly cleaned in
+  LibreOffice Calc
 
 Variable definitions for decisions.csv and decisions_2.csv:
 
