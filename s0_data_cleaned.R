@@ -74,7 +74,7 @@ dec$submit_year         <- factor(dec$submit_year,
                                  ordered = FALSE)
 
 # to avoid multicollinearity
-# Keep only firstAuthGeog since this is highly correlated with:
+# Keep only first_auth_geog since this is highly correlated with:
 # corr_auth_geog, submit_auth_geog, senior_auth_geog
 # Keep only no_reviewers_obtained since this is highly correlated with no_reviewers_responded
 
