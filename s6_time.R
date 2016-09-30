@@ -4,8 +4,8 @@ source('libraries.R')
 
 dec0 <- dec
 
-dec0$paper_rejected   <- relevel(dec0$paper_rejected, ref = "Yes")
-dec0$first_auth_geog  <- relevel(dec0$first_auth_geog, ref = "North America")
+dec0$paper_rejected  <- relevel(dec0$paper_rejected, ref = "Yes")
+dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "North America")
 
 contrasts(dec0$paper_rejected)
 contrasts(dec0$first_auth_geog)

@@ -1,3 +1,5 @@
+# this is exploratory
+
 source("libraries.R")
 
 # copy main data file to new data frame
