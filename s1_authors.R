@@ -1,10 +1,10 @@
 source("libraries.R")
 
+dec0 <- dec
+
 # demographics of authors
 # countries, regions, languages, HDI for
 # first authors, last authors, and interactions between first and last authors
-
-dec0 <- dec
 
 first_author_tbl_1 <- table(dec0$first_auth_geog)
 first_author_tbl_2 <- round(table(dec0$first_auth_geog) / sum(table(dec0$first_auth_geog)),4) * 100
@@ -14,159 +14,87 @@ senior_author_tbl_1 <- table(dec0$senior_auth_geog)
 senior_author_tbl_2 <- round(table(dec0$senior_auth_geog) / sum(table(dec0$senior_auth_geog)),4) * 100
 senior_author_tbl_1 ; senior_author_tbl_2
 
-chisq.test(first_author_tbl_1, senior_author_tbl_2, simulate.p.value = TRUE)
+chisq.test(first_author_tbl_1, senior_author_tbl_1, simulate.p.value = TRUE)
 
 first_senior_author_tbl_1 <- table(dec0$first_auth_geog, dec$senior_auth_geog)
 first_senior_author_tbl_2 <- round(first_senior_author_tbl_1 /
                                            rowSums(first_senior_author_tbl_1),3)
-first_senior_author_tbl_3 <- data.frame(round(first_senior_author_tbl_1 /
-                                                      rowSums(first_senior_author_tbl_1),3))
-names(first_senior_author_tbl_3) <- c("First_Author", "Senior_Author", "Proportion")
-assocstats(first_senior_author_tbl_3)
+assocstats(first_senior_author_tbl_1)
 
-first_senior_author_tbl_4 <- table(dec$senior_auth_geog, dec$first_auth_geog)
-first_senior_author_tbl_5 <- round(first_senior_author_tbl_4 /
-                                           rowSums(first_senior_author_tbl_4),3)
-first_senior_author_tbl_6 <- data.frame(round(first_senior_author_tbl_5 /
-                                                      rowSums(first_senior_author_tbl_5),3))
+##### ----- ###### 
 
-names(first_senior_author_tbl_6) <- c("Senior_Author", "First_Author", "Proportion")
-assocstats(first_senior_author_tbl_6)
-
-dec_scores        <- select(dec0, ms_id, mean_review_score, paper_rejected)
-names(dec_scores) <- c("ms_id", "mean_review", "paper_rejected")
+dec_review        <- select(dec0, ms_id, mean_review_score, paper_rejected)
+names(dec_review) <- c("ms_id", "mean_review", "paper_rejected")
 dec_review        <- inner_join(author_decisions,
-                                dec_scores,
+                                dec_review,
                                 by = "ms_id")
-
-rm(dec_scores)
-
 dec_review$submit_month        <- NULL
 dec_review$author_institution  <- NULL
 
-dec_review$submit_date <- format(dec_review$submit_date,
-                                 format = "%m/%d/%Y")
+## Performed one time only
+# author_country_id <- unique(dec_review$author_country)
+# author_country_id <- edit(author_country_id) # remove NA; change Georgia to Tbilisi (fix state name Georgia)
+# country_id        <- geocode(author_country_id,
+#                              output = "latlon",
+#                              source = "google")
+# country_id$author_country <- author_country_id
+# write.table(country_id, file="country_id.txt", quote=TRUE, sep=",", row.names=FALSE)
+# rm(author_country_id)
 
-dec_review$submit_date <- as.Date(dec_review$submit_date)
+auth_dec <- melt(dec_review, id.vars = c("ms_id",
+                                         "author_order",
+                                         "author_country"))
 
-authorcountry_id <- unique(dec_review$author_country)
-authorcountry_id <- edit(author_country_id) # remove NA; change Georgia to Tbilisi (fix state name Georgia)
-country_id       <- geocode(author_country_id,
-                            output = "latlon",
-                            source = "google")
-country_id$author_country <- author_country_id
-write.table(country_id, file="country_id.txt", quote=TRUE, sep=",", row.names=FALSE)
+auth_dec <- auth_dec %>%
+        left_join(country_id)
 
-mp        <- NULL
-map_world <- borders("world", colour = "black", fill = "#019E73")
-mp        <- ggplot() + map_world
-mp + geom_point(data =countryid,
-                aes(x = lon, y = lat)) + theme_bw()
+auth_dec <- filter(auth_dec,
+                   variable == "corresponding_author")
 
-auth_dec_1 <- melt(dec_review, id.vars = c("ms_id",
-                                    "author_order",
-                                    "author_country"))
-
-auth_dec_1 <- auth_dec_1 %>%
-  left_join(countryid)
-
-auth_dec_2 <- filter(auth_dec_1,
-                     variable == "corresponding_author")
-rm(auth_dec_1)
-
-first_author <- filter(auth_dec_2,
-                       author_order == 1) %>% select(ms_id, author_country)
-
-last_author  <- auth_dec_2 %>% group_by(ms_id) %>%
-        filter(author_order == max(author_order, na.rm = TRUE)) %>%
+first_author <- auth_dec %>% group_by(ms_id) %>%
+        filter(author_order == min(author_order)) %>%
         select(ms_id, author_country)
 
-first_author <- first_author %>% inner_join(countryid)
-last_author  <- last_author %>% inner_join(countryid)
-last_author  <- data.frame(last_author)
+last_author  <- auth_dec %>% group_by(ms_id) %>%
+        filter(author_order == max(author_order)) %>%
+        select(ms_id, author_country)
 
-auth_dec_3          <- inner_join(first_author, last_author, by = "ms_id")
-names(auth_dec_3)   <- c("ms_id", "first_author", "lon_fa", "lat_fa", "last_author", "lon_la", "lat_la")
-head(auth_dec_3)
+first_author <- first_author %>% inner_join(country_id)
+last_author  <- last_author %>% inner_join(country_id)
 
-auth_dec_4          <- auth_dec_3[,-1] # remove ms_id column
-head(auth_dec_4)
+auth_dec        <- inner_join(first_author, last_author, by = "ms_id")
+names(auth_dec) <- c("ms_id", "first_author", "lon_fa", "lat_fa", "last_author", "lon_la", "lat_la")
+auth_dec        <- auth_dec[,-1] # remove ms_id column
+auth_dec        <- data.frame(auth_dec)
 
-auth_dec_4b         <- select(auth_dec_4, first_author, last_author)
-plot(graph_from_data_frame(auth_dec_4b))
+## Exploratory graph
+# set.seed(1234)
+# auth_dec_test         <- select(auth_dec, first_author, last_author)
+# ggnet2(auth_dec_test, label = TRUE, label.size = 4)
+# rm(auth_dec_test)
 
-set.seed(1234)
-ggnet2(auth_dec_4b, label = TRUE, label.size = 4)
-
-auth_freq           <- sort(table(auth_dec_4$first_author))
+auth_freq           <- sort(table(auth_dec$first_author))
 auth_freq           <- as.data.frame(auth_freq)
 auth_freq$country   <- rownames(auth_freq)
 rownames(auth_freq) <- NULL
 names(auth_freq)    <- c("Freq", "first_author")
 
-auth_dec_6 <- auth_dec_4 %>% distinct(first_author) %>% select(first_author, lon_fa, lat_fa)
-auth_dec_6 <- inner_join(auth_dec_6, auth_freq, by = "first_author")
-
-# identify countries with at least 100 first authors
-sort(table(auth_dec_4$first_author))
-
-# Usage: fala("United States") or fala("China")
-fala <- function(x) {
-        auth_dec_5 <- filter(auth_dec_4, first_author == x)
-        auth_dec_5b <- data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-        auth_dec_5b$Perc <- round(auth_dec_5b$Freq / sum(auth_dec_5b$Freq), 3) * 100
-        auth_dec_5b[order(auth_dec_5b$Perc, decreasing = TRUE), ]
+# Usage: first_last_author("United States") or fala("China")
+first_last_author_stats <- function(x) {
+        auth_dec_1 <- filter(auth_dec, first_author == x)
+        auth_dec_1b <- data.frame(table(auth_dec_1$first_author, auth_dec_1$last_author))
+        auth_dec_1b$Perc <- round(auth_dec_1b$Freq / sum(auth_dec_1b$Freq), 3) * 100
+        auth_dec_1b[order(auth_dec_1b$Perc, decreasing = TRUE), ]
 }
 
-auth_dec_5 <- filter(auth_dec_4, first_author == "United States")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "China")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "Australia")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "United Kingdom")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "France")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "Germany")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "Canada")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-auth_dec_5 <- filter(auth_dec_4, first_author == "Spain")
-data.frame(table(auth_dec_5$first_author, auth_dec_5$last_author))
-
-mp       <- NULL
-map_world <- borders("world", colour = "black", fill = "#FFFFFF")
-mp       <- ggplot() + map_world
-
-for ( i in 1:nrow(auth_dec_5) ) {
-        from <- c(auth_dec_5$lon_fa[i], auth_dec_5$lat_fa[i])
-        to   <- c(auth_dec_5$lon_la[i], auth_dec_5$lat_la[i])
-        inter <- as.data.frame(gcIntermediate(
-                p1 = from,
-                p2 = to,
-                n = 50,
-                addStartEnd = TRUE))
-        names(inter) <- c("lon", "lat")
-        mp <- mp + geom_line(data = inter, aes(x = lon, y = lat), color = "blue")
-}
-
-mp + geom_point(data = auth_dec_6, aes(x = lon_fa, y = lat_fa, size = (Freq/sum(Freq)))) +
-        labs(x = "Longitude",
-             y = "Latitude") +
-        theme(axis.text.x = element_text(size = 12,
-                                         colour = "black")) +
-        theme(axis.text.y = element_text(size = 12,
-                                         colour = "black")) +
-        theme_bw() +
-        theme(legend.position = "none") 
+first_last_author_stats("United States")
+first_last_author_stats("China")
+first_last_author_stats("Australia")
+first_last_author_stats("United Kingdom")
+first_last_author_stats("France")
+first_last_author_stats("Germany")
+first_last_author_stats("Canada")
+first_last_author_stats("Spain")
 
 auth_country_freq         <- sort(table(dec_review$author_country), decreasing = TRUE)
 auth_country_freq         <- data.frame(auth_country_freq)
@@ -304,6 +232,6 @@ rm(auth_dec_1, auth_dec_2, auth_dec_3, auth_dec_4,
 
 rm(int_auth_1, int_auth_2)
 
-rm(auth_country_freq, auth_freq, authorcountryid, countryid, fala)
+rm(auth_country_freq, auth_freq, authorcountryid, country_id, fala)
 
 rm(p, year_geo, fala)

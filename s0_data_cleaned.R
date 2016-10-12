@@ -78,7 +78,7 @@ dec$submit_year         <- factor(dec$submit_year,
 # corr_auth_geog, submit_auth_geog, senior_auth_geog
 # Keep only no_reviewers_obtained since this is highly correlated with no_reviewers_responded
 
-dec <- select(dec, -corr_auth_geog, -submit_auth_geog, -senior_auth_geog, -no_reviewers_responded)
+####dec <- select(dec, -corr_auth_geog, -submit_auth_geog, -senior_auth_geog, -no_reviewers_responded)
 
 ### Author decisions data #### 
 
