@@ -4,6 +4,17 @@ source("libraries.R")
 
 dec0 <- dec
 
+table(dec0$handling_editor_geog)
+sort(round(table(dec0$handling_editor_geog) / sum(table(dec0$handling_editor_geog)),3), decreasing = TRUE)
+
+table(dec0$first_auth_geog)
+table(dec0$handling_editor_geog)
+round(table(dec0$first_auth_geog) / table(dec0$handling_editor_geog),2)
+round(table(dec0$handling_editor_geog) / table(dec0$first_auth_geog),2)
+
+f.h.tbl <- table(dec0$first_auth_geog, dec0$handling_editor_geog)
+assocstats(y) ; rm(f.h.tbl)
+
 dec0$paper_rejected       <- relevel(dec0$paper_rejected, ref = "Yes")
 dec0$handling_editor_geog <- relevel(dec0$handling_editor_geog, ref = "North America")
 
@@ -34,4 +45,4 @@ dec0$prob      <- predict(fit.1, type = c("response"))
 g <- roc(paper_rejected ~ prob, data = dec0) ; g
 plot(g)
 
-rm(dec0, fit.0, fit.1, fit.chi, chi.df, chisq.prob, prob, g)
+rm(dec0, fit.0, fit.1, fit.chi, chi.df, chisq.prob, g)

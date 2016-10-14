@@ -34,4 +34,4 @@ dec0$prob   <- predict(fit.1, type = c("response"))
 g <- roc(paper_rejected ~ prob, data = dec0) ; g
 plot(g)
 
-rm(dec0, fit.0, fit.1, fit.chi, chi.df, chisq.prob, prob, g)
+rm(dec0, fit.0, fit.1, fit.chi, chi.df, chisq.prob, g)

@@ -21,7 +21,7 @@ summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
 # fix number for Terms
-wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:50) # test the ranking
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:13) # test the ranking
 1 - pchisq(fit.0$deviance, fit.0$df.residual) # test the model
 
 fit.1       <- glm(paper_rejected ~ 1, data = dec0, family = "binomial")
@@ -32,7 +32,7 @@ fit.chi ; chi.df ; chisq.prob
 
 dec0$prob <- predict(fit.1, type = c("response"))
 
-g <- roc(paperRejected ~ prob, data = dec0) ; g
+g <- roc(paper_rejected ~ prob, data = dec0) ; g
 plot(g)
 
 rm(dec0, auth_edit_tbl1, fit.0, fit.1, fit.chi, chi.df, chisq.prob, g)

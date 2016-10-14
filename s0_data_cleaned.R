@@ -112,3 +112,14 @@ author_decisions$author_country <- as.character(author_decisions$author_country)
 author_decisions$final_decision <- NULL # the data is not good / correct
 
 author_decisions$submit_date <- as.Date(as.character(author_decisions$submit_date))
+
+###
+
+# geocoding author countries ; after loading s1_authors.R
+author_country_id <- unique(dec_review$author_country)
+country_id        <- geocode(author_country_id,
+                             output = "latlon",
+                             source = "google")
+country_id$author_country <- author_country_id
+write.table(country_id, file="country_id.txt", quote=TRUE, sep=",", row.names=FALSE)
+rm(author_country_id)

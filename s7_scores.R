@@ -38,7 +38,6 @@ sf <- function(y) {
 }
 
 (s <- with(dec0, summary(as.numeric(mean.rs) ~ first_auth_geog, fun = sf)))
-(s <- with(dec0, summary(as.numeric(mean.rs) ~ first_auth_geog, fun = sf)))
 
 plot(s, which=1:3, pch=1:3,
      xlab = "Logit",
