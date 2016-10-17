@@ -65,7 +65,12 @@ rownames(n.sdf) <- NULL
 names(n.sdf)    <- c("OR", "Region")
 Level           <- rep("Overall", 6)
 n.sdf$Level     <- Level
-n.sdf           <- edit(n.sdf) # Change Region names to match region names in SDF
+n.sdf$Region    <- gsub("first_auth_geogAfrica", "Africa", n.sdf$Region)
+n.sdf$Region    <- gsub("first_auth_geogAsia", "Asia", n.sdf$Region)
+n.sdf$Region    <- gsub("first_auth_geogLatin America", "Latin America", n.sdf$Region)
+n.sdf$Region    <- gsub("first_auth_geogNorth America", "North America", n.sdf$Region)
+n.sdf$Region    <- gsub("first_auth_geogOceania", "Oceania", n.sdf$Region)
+n.sdf$Region    <- gsub("first_auth_geogUnited Kingdom", "United Kingdom", n.sdf$Region)
 n.sdf$Region    <- as.factor(n.sdf$Region)
 n.sdf$Level     <- as.factor(n.sdf$Level)
 s.df$Region     <- droplevels(s.df$Region)
