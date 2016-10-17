@@ -7,7 +7,7 @@ dec0 <- dec
 dec0                 <- select(dec0, sent_for_review, first_auth_geog)
 dec0                 <- filter(dec0, !is.na(first_auth_geog))
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
-dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "United Kingdom")
+dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
 
 summary(dec0)
 
