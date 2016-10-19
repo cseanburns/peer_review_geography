@@ -51,3 +51,32 @@ g <- roc(paper_rejected ~ prob, data = dec0) ; g
 plot(g)
 
 rm(dec0, fit.0, f.h.tbl, fit.chi, chi.df, chisq.prob, g)
+
+### in progress -- test if multinational authorships are penalized ###
+### need to remove singleton authorships ###
+
+dec0 <- dec
+
+dec_handling_editors <- select(dec0, ms_id, paper_rejected)
+dec_author_country   <- select(author_decisions, ms_id, author_country)
+dec_mixed_countries  <- inner_join(dec_handling_editors,
+                                   dec_author_country,
+                                   by = "ms_id")
+dec_mixed_countries  <- distinct(dec_mixed_countries)
+dec_mixed_countries$mixed  <- duplicated(dec_mixed_countries$ms_id)
+
+rm(dec0, dec_handling_editors, dec_author_country)
+
+mixed.true  <- dec_mixed_countries %>% filter(mixed == TRUE)
+mixed.false <- dec_mixed_countries %>% filter(mixed == FALSE)
+
+rm(dec_mixed_countries)
+
+mixed.true$author_country  <- NULL
+mixed.false$author_country <- NULL
+
+mixed.false.logic <- mixed.false[!(mixed.false$ms_id %in% mixed.true$ms_id),]
+mixed.combined    <- rbind(mixed.true, mixed.false.logic)
+mixed.combined    <- unique(mixed.combined)
+
+rm(mixed.true, mixed.false, mixed.false.logic)
