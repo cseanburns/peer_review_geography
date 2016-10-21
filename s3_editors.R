@@ -52,11 +52,15 @@ plot(g)
 
 rm(dec0, fit.0, f.h.tbl, fit.chi, chi.df, chisq.prob, g)
 
-### in progress -- test if multinational authorships are penalized ###
-### need to remove singleton authorships ###
+### test if multinational authorships are penalized ###
+### identifies all manuscripts where authors are from the same nation and
+### authors are from different nations
+### need to remove single authorships ###
 
-dec0 <- dec
+dec0 <- dec # start over
 
+# create new database with manuscript IDs, paper rejection status, and author
+# country.
 dec_handling_editors <- select(dec0, ms_id, paper_rejected)
 dec_author_country   <- select(author_decisions, ms_id, author_country)
 dec_mixed_countries  <- inner_join(dec_handling_editors,
@@ -79,4 +83,19 @@ mixed.false.logic <- mixed.false[!(mixed.false$ms_id %in% mixed.true$ms_id),]
 mixed.combined    <- rbind(mixed.true, mixed.false.logic)
 mixed.combined    <- unique(mixed.combined)
 
-rm(mixed.true, mixed.false, mixed.false.logic)
+# identify single authorships
+singles.df <- select(author_decisions, ms_id)
+singles.df <- data.frame(table(singles.df))
+singles.df <- singles.df %>% filter(Freq == 1)
+singles.df$singles.df <- as.integer(as.character(singles.df$singles.df))
+singles <- singles.df$singles.df
+
+# remove singler authorships from data for analysis
+
+mixed.combined <- mixed.combined[!(mixed.combined$ms_id %in% singles),]
+
+# run chi square test on mixed authorship and then on rejection status
+chisq.test(table(mixed.combined$mixed))
+chisq.test(table(mixed.combined$paper_rejected, mixed.combined$mixed))
+
+rm(mixed.true, mixed.false, mixed.false.logic, singles, singles.df)
