@@ -38,3 +38,45 @@ plot(g)
 
 rm(dec0, lang, dec_lang)
 rm(fit.0, fit.chi, chi.df, chisq.prob, g)
+
+#### Examinging relationship between HDI and Mean Review Score ####
+
+dec0 <- dec
+
+hdi_test.1 <- author_decisions %>%
+        filter(author_order == 1) %>%
+        select(ms_id, author_country, HDI)
+hdi_test.2 <- dec0 %>% select(ms_id, mean_review_score)
+
+hdi_test.3 <- inner_join(hdi_test.1, hdi_test.2, by = "ms_id")
+
+rm(hdi_test.1, hdi_test.2)
+
+# look at all data
+
+plot(hdi_test.3$mean_review_score ~ hdi_test.3$HDI)
+cor.test(hdi_test.3$mean_review_score, hdi_test.3$HDI,
+         method = "spearman", conf.level = 0.95, exact = FALSE)
+
+# parse out data into upper category and lower category
+
+hdi_lower <- hdi_test.3 %>% filter(HDI <= 0.85)
+plot(hdi_lower$mean_review_score ~ hdi_lower$HDI)
+cor.test(hdi_lower$HDI, hdi_lower$mean_review_score, method = "spearman",
+         conf.level = 0.95, exact = FALSE)
+
+hdi_upper <- hdi_test.3 %>% filter(HDI > 0.85)
+plot(hdi_upper$mean_review_score ~ hdi_upper$HDI)
+cor.test(hdi_upper$HDI, hdi_upper$mean_review_score, method = "spearman",
+         conf.level = 0.95, exact = FALSE)
+
+# just the last two columns (score & HDI)
+hdi_test.4 <- hdi_test.3[,3:4]
+boot_hdi <- function(hdi_test.4,i) {
+        cor(hdi_test.4$HDI[i], hdi_test.4$mean_review_score[i],
+            method = "spearman")
+}
+
+library(boot)
+boot_hdi_spearman <- boot(hdi_test.4, boot_hdi, 10000, parallel = "multicore")
+boot.ci(boot_hdi_spearman)
