@@ -18,7 +18,7 @@ dec_review$author_country      <- gsub("Georgia", "Tbilisi", dec_review$author_c
 
 auth_country_freq        <- sort(table(dec_review$author_country), decreasing = TRUE)
 auth_country_freq        <- data.frame(auth_country_freq)
-names(auth_country_freq) <- "Freq"
+names(auth_country_freq) <- c("Country", "Freq")
 auth_country_freq$ratios <- auth_country_freq$Freq[1] / auth_country_freq$Freq
 auth_country_freq$count  <- seq(1:length(auth_country_freq$Freq))
 
@@ -45,6 +45,50 @@ assocstats(first_senior_author_tbl_1)
 rm(first_author_tbl_1, first_author_tbl_2)
 rm(senior_author_tbl_1, senior_author_tbl_2)
 rm(first_senior_author_tbl_1, first_senior_author_tbl_2)
+
+# Geographical difference between first and corresponding authors
+
+first_author_tbl_1 <- table(dec0$first_auth_geog)
+first_author_tbl_2 <- round(table(dec0$first_auth_geog) / sum(table(dec0$first_auth_geog)),4) * 100
+first_author_tbl_1 ; first_author_tbl_2
+
+corr_author_tbl_1 <- table(dec0$corr_auth_geog)
+corr_author_tbl_2 <- round(table(dec0$corr_auth_geog) / sum(table(dec0$corr_auth_geog)),4) * 100
+corr_author_tbl_1 ; corr_author_tbl_2
+
+chisq.test(first_author_tbl_1, corr_author_tbl_1, simulate.p.value = TRUE)
+
+first_corr_author_tbl_1 <- table(dec0$first_auth_geog, dec0$corr_auth_geog)
+first_corr_author_tbl_2 <- round(first_corr_author_tbl_1 /
+                                           rowSums(first_corr_author_tbl_1),3)
+assocstats(first_corr_author_tbl_1)
+
+rm(first_author_tbl_1, first_author_tbl_2)
+rm(corr_author_tbl_1, corr_author_tbl_2)
+rm(first_corr_author_tbl_1, first_corr_author_tbl_2)
+
+# Geographical difference between first and submitting authors
+
+first_author_tbl_1 <- table(dec0$first_auth_geog)
+first_author_tbl_2 <- round(table(dec0$first_auth_geog) / sum(table(dec0$first_auth_geog)),4) * 100
+first_author_tbl_1 ; first_author_tbl_2
+
+sub_author_tbl_1 <- table(dec0$submit_auth_geog)
+sub_author_tbl_2 <- round(table(dec0$submit_auth_geog) / sum(table(dec0$submit_auth_geog)),4) * 100
+sub_author_tbl_1 ; sub_author_tbl_2
+
+chisq.test(first_author_tbl_1, sub_author_tbl_1, simulate.p.value = TRUE)
+
+first_sub_author_tbl_1 <- table(dec0$first_auth_geog, dec0$submit_auth_geog)
+first_sub_author_tbl_2 <- round(first_corr_author_tbl_1 /
+                                           rowSums(first_corr_author_tbl_1),3)
+assocstats(first_sub_author_tbl_1)
+
+rm(first_author_tbl_1, first_author_tbl_2)
+rm(corr_author_tbl_1, corr_author_tbl_2)
+rm(first_corr_author_tbl_1, first_corr_author_tbl_2)
+
+
 
 # Set up for Table 2 in manuscript 
 

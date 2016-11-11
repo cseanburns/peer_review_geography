@@ -13,7 +13,7 @@ round(table(dec0$first_auth_geog) / table(dec0$handling_editor_geog),2)
 round(table(dec0$handling_editor_geog) / table(dec0$first_auth_geog),2)
 
 f.h.tbl <- table(dec0$first_auth_geog, dec0$handling_editor_geog)
-assocstats(y) ; rm(f.h.tbl)
+assocstats(f.h.tbl) ; rm(f.h.tbl)
 
 dec0$paper_rejected       <- relevel(dec0$paper_rejected, ref = "Yes")
 dec0$handling_editor_geog <- relevel(dec0$handling_editor_geog, ref = "North America")
