@@ -99,21 +99,21 @@ Source: http://hdr.undp.org/en/countries, accessed on May 27, 2016
 
 **Languages, CIA World Handbook:**
 
-- In the CIA World Handbook, languages are listed in rank order by country.
+- In the CIA World Factbook, languages are listed in rank order by country.
 - If English is listed as an official language, despite the rank order, then English is selected. This is done to reduce bias in the analysis.
 - If the country is not listed, then an alternate site is used.
 
 Notes and alternate sites for the following countries are listed below:
 
 - Cameroon people speak over two dozen African langauges (no dominant language), but English is listed as one of the official languages, so English is listed as the language for Cameroon.
-- French Guiana: French from Wikipedia (5/31/2016)
 - Ghana lists English as an official language. English is used.
 - India: English
-- Martinique: French from Wikipedia (5/31/2016)
 - Namibia: English
 - Norway lists two versions of Norwegian: Bokmal Norwegian (official) and Nynorsk Norwegian (official). I reduced to Norwegian.
 - Rwanda: English.
 - Sri Lanka: English has special status in the constitution. English is used.
+- French Guiana: French from Wikipedia (5/31/2016)
+- Martinique: French from Wikipedia (5/31/2016)
 
 Source: 
 https://www.cia.gov/library/publications/the-world-factbook/fields/2098.html, 
