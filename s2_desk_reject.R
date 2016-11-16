@@ -41,8 +41,6 @@ reorder_size <- function(x) {
         factor(x, levels = names(sort(table(x), decreasing = TRUE)))
 }
 
-OR <- sort(round(exp(coef(fit.0)),3), decreasing = TRUE)
-
 ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
         geom_bar() + theme_bw() + 
         scale_fill_grey(name = "Sent for Review") +
