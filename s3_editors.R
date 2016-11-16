@@ -1,35 +1,45 @@
-# Editors by geographic regions and comparing to paper rejections
+# Editors by geographic regions and comparing to paper rejections 
+# Focus on data set filtered by sent for review since this makes more logical sense
 
 source("libraries.R")
 
-dec0 <- dec
+table(dec_sent$handling_editor_geog)
+sort(round(table(dec_sent$handling_editor_geog) / sum(table(dec_sent$handling_editor_geog)),3), decreasing = TRUE)
 
-table(dec0$handling_editor_geog)
-sort(round(table(dec0$handling_editor_geog) / sum(table(dec0$handling_editor_geog)),3), decreasing = TRUE)
+table(dec_sent$first_auth_geog) ; table(dec_sent$handling_editor_geog)
+round(table(dec_sent$first_auth_geog) / table(dec_sent$handling_editor_geog),2)
+round(table(dec_sent$handling_editor_geog) / table(dec_sent$first_auth_geog),2)
 
-table(dec0$first_auth_geog)
-table(dec0$handling_editor_geog)
-round(table(dec0$first_auth_geog) / table(dec0$handling_editor_geog),2)
-round(table(dec0$handling_editor_geog) / table(dec0$first_auth_geog),2)
-
-f.h.tbl <- table(dec0$first_auth_geog, dec0$handling_editor_geog)
+f.h.tbl <- table(dec_sent$first_auth_geog, dec_sent$handling_editor_geog)
 assocstats(f.h.tbl) ; rm(f.h.tbl)
 
-dec0$paper_rejected       <- relevel(dec0$paper_rejected, ref = "Yes")
-dec0$handling_editor_geog <- relevel(dec0$handling_editor_geog, ref = "North America")
+dec_sent$paper_rejected       <- relevel(dec_sent$paper_rejected, ref = "Yes")
+dec_sent$handling_editor_geog <- relevel(dec_sent$handling_editor_geog, ref = "North America")
 
-contrasts(dec0$paper_rejected)
-contrasts(dec0$handling_editor_geog)
+contrasts(dec_sent$paper_rejected)
+contrasts(dec_sent$handling_editor_geog)
 
-fit.0 <- glm(paper_rejected ~ handling_editor_geog, data = dec0, family = "binomial")
+fit.0 <- glm(paper_rejected ~ handling_editor_geog, data = dec_sent, family = "binomial")
 summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
-ggplot(dec0, aes(x = handling_editor_geog, fill = paper_rejected)) +
-        geom_bar() + theme_bw() + scale_fill_grey(name = "Paper Rejected") +
-        xlab("Geographical Region of Handling Editor") +
-        ylab("Count") +
-        theme(legend.position = c(.9,.8))
+dec_tmp <- select(dec_sent, handling_editor_geog, paper_rejected)
+table(dec_tmp)
+
+reorder_size <- function(x) {
+        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
+}
+
+ggplot(dec_tmp, aes(x = reorder_size(handling_editor_geog), fill = paper_rejected)) +
+        geom_bar(stat = "count") + theme_bw() +
+        scale_fill_grey(name = "Revision Invited / Declined") +
+        labs(x = "Geographical Region of Handling Editor",
+        y = "Count") +
+        theme(axis.text.y = element_text(size = 12,
+                                    colour = "black")) +
+        theme(axis.text.x = element_text(size = 12,
+                                    colour = "black")) +
+        theme(legend.position = c(.8,.8))
 
 # Test the overall effect of the levels
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
@@ -45,9 +55,10 @@ chisq.prob  <- 1 - pchisq(fit.chi, chi.df)
 # Display the results
 fit.chi ; chi.df ; chisq.prob
 
-dec0$prob      <- predict(fit.0, type = c("response"))
+dec_sent$prob <- predict(fit.0, type = c("response"))
 
-g <- roc(paper_rejected ~ prob, data = dec0) ; g
+g <- roc(paper_rejected ~ prob, data = dec_sent) ; g
 plot(g)
 
-rm(dec0, fit.0, f.h.tbl, fit.chi, chi.df, chisq.prob, g)
+rm(fit.0, f.h.tbl, fit.chi, chi.df, chisq.prob, g)
+dec_sent$prob <- NULL
