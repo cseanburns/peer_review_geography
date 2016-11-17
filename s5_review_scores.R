@@ -43,31 +43,7 @@ sf <- function(y) {
 }
 (s <- with(dec_sent, summary(as.numeric(mean.rs) ~ first_auth_geog, fun = sf)))
 
-
-
-
-
-###
-  
-mean.rs.1 <- polr(mean.rs ~ first_auth_geog, data = dec_sent, Hess = TRUE)
-(ctable <- coef(summary(mean.rs.1)))
-p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
-(ctable <- cbind(ctable, "p value" = p))
-(ci <- confint(mean.rs.1))
-
-exp(cbind(OR = coef(mean.rs.1), ci))
-table(dec_sent$paper_rejected, dec_sent$mean.rs)
-table(mean.rs.1$model)
-
-sf <- function(y) {
-        c('Y>=1' = qlogis(mean(y >= 1)),
-          'Y>=2' = qlogis(mean(y >= 2)),
-          'Y>=3' = qlogis(mean(y >= 3)))
-}
-
-(s <- with(dec_sent, aggregate(as.numeric(mean.rs) ~ first_auth_geog, FUN = sf)))
-
-ggplot(as.data.frame(table(mean.rs.1$model)),
+ggplot(as.data.frame(table(m$model)),
        aes(x = first_auth_geog, y = sort(Freq, decreasing = TRUE), fill = mean.rs)) +
        geom_bar(stat="identity") + scale_fill_grey(name = "Review Score") +
        theme_bw() +
@@ -79,11 +55,6 @@ ggplot(as.data.frame(table(mean.rs.1$model)),
                                          colour = "black")) +
         theme(legend.position = c(.8,.8))
 
-# The code below stopped working -- perhaps due to a version upgrade of R? Will
-# have to work out, perhaps use the aggregrate function used, as above.
-
-(s <- with(dec_sent, summary(as.numeric(mean.rs) ~ first_auth_geog, FUN = sf)))
-
 plot(s, which=1:3, pch=1:3,
      xlab = "Logit",
      ylab = "",
@@ -92,11 +63,12 @@ plot(s, which=1:3, pch=1:3,
 s.tbl <- as.table(s)
 s.tbl <- s.tbl[1,]
 s.df  <- data.frame(s.tbl)
+library(dplyr)
 s.df  <- filter(s.df, Var2 != "Y>=1" & Var2 != "N")
 s.df  <- filter(s.df, Var1 != "Europe")
 names(s.df) <- c("Region", "Level", "OR")
 
-n.sdf           <- data.frame(exp(coef(mean.rs.1)))
+n.sdf           <- data.frame(exp(coef(m)))
 n.sdf$Region    <- rownames(n.sdf)
 rownames(n.sdf) <- NULL
 names(n.sdf)    <- c("OR", "Region")
@@ -118,7 +90,12 @@ ggplot(t.sdf, aes(x = OR, y = Region)) +
        geom_point(aes(shape = factor(Level))) +
        scale_shape(solid = FALSE, name = "OR Level") + 
        theme_bw() +
-       xlab("Logits") +
-       ylab("Geographical Regions of First Authors")
+        labs(x = "Logits",
+             y = "Geographical Region of First Authors") +
+        theme(axis.text.y = element_text(size = 12,
+                                         colour = "black")) +
+        theme(axis.text.x = element_text(size = 12,
+                                         colour = "black")) +
+        theme(legend.position = c(0.95,0.85))
 
 rm(dec_sent, mean.rs, ctable, p, ci, sf, s, s.tbl, s.df, n.sdf, s.df, t.sdf) 
