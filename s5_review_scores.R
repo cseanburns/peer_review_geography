@@ -29,8 +29,8 @@ rm(mean.rs)
 ftable(xtabs(~ paper_rejected + mean.rs + first_auth_geog, data = dec_sent))
 
 m <- polr(mean.rs ~ first_auth_geog, data = dec_sent, Hess = TRUE)
-summary(m)
-(ctable <- -coef(summary(m)))
+summary(m, digits = 3)
+(ctable <- coef(summary(m)))
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
 (ci <- confint(m))
