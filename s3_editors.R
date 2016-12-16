@@ -3,8 +3,10 @@
 
 source("libraries.R")
 
-table(dec_sent$handling_editor_geog)
-sort(round(table(dec_sent$handling_editor_geog) / sum(table(dec_sent$handling_editor_geog)),3), decreasing = TRUE)
+sort(table(dec_sent$handling_editor_geog), decreasing = TRUE)
+sort(round(table(dec_sent$handling_editor_geog) /
+                   sum(table(dec_sent$handling_editor_geog)),3),
+     decreasing = TRUE)
 
 table(dec_sent$first_auth_geog) ; table(dec_sent$handling_editor_geog)
 round(table(dec_sent$first_auth_geog) / table(dec_sent$handling_editor_geog),2)
@@ -14,7 +16,8 @@ f.h.tbl <- table(dec_sent$first_auth_geog, dec_sent$handling_editor_geog)
 assocstats(f.h.tbl) ; rm(f.h.tbl)
 
 dec_sent$paper_rejected       <- relevel(dec_sent$paper_rejected, ref = "Yes")
-dec_sent$handling_editor_geog <- relevel(dec_sent$handling_editor_geog, ref = "North America")
+dec_sent$handling_editor_geog <- relevel(dec_sent$handling_editor_geog,
+                                         ref = "Europe")
 
 contrasts(dec_sent$paper_rejected)
 contrasts(dec_sent$handling_editor_geog)

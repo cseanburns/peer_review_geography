@@ -48,20 +48,33 @@ dec_lang$prob <- predict(fit.0, type = c("response"))
 g <- roc(paper_rejected ~ prob, data = dec_lang) ; g
 plot(g)
 
-#### Examinging HDI and Outcomes ####
+###
 
-hdi_test <- author_decisions %>%
-        filter(author_order == 1) %>%
-        select(ms_id, author_country, HDI)
+dec_lang$sent_for_review <- relevel(dec_lang$sent_for_review, ref = "No")
+dec_lang$first_auth_geog <- relevel(dec_lang$first_auth_geog, ref = "Europe")
+dec_lang$english <- relevel(dec_lang$english, ref = "TRUE")
+contrasts(dec_lang$sent_for_review)
+contrasts(dec_lang$first_auth_geog)
+contrasts(dec_lang$english)
 
-hdi_test_sent <- inner_join(hdi_test, dec_lang_sent, by = "ms_id")
-hdi_test_all <- inner_join(hdi_test, dec_lang, by = "ms_id")
-rm(hdi_test)
+fit.2 <- glm(sent_for_review ~ first_auth_geog + english,
+             family = "binomial", data = dec_lang)
+summary(fit.2)
+round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
 
-# Parse out data into upper category and lower category
+##
 
-hdi_lower <- hdi_test_all %>% filter(HDI <= 0.85)
-plot(hdi_lower$sent_for_review ~ hdi_lower$HDI)
+dec_lang_sent$paper_rejected <- relevel(dec_lang_sent$paper_rejected,
+                                        ref = "Yes")
+dec_lang_sent$first_auth_geog <- relevel(dec_lang_sent$first_auth_geog,
+                                         ref = "Europe")
+dec_lang_sent$english <- relevel(dec_lang_sent$english, ref = "TRUE")
 
-hdi_upper <- hdi_test_sent %>% filter(HDI > 0.85)
-plot(hdi_upper$paper_rejected  ~ hdi_upper$HDI)
+contrasts(dec_lang_sent$paper_rejected)
+contrasts(dec_lang_sent$first_auth_geog)
+contrasts(dec_lang_sent$english)
+
+fit.3 <- glm(paper_rejected ~ first_auth_geog + english,
+             family = "binomial", data = dec_lang_sent)
+summary(fit.3)
+round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)

@@ -5,6 +5,7 @@
 require("ggplot2")
 require("MASS")
 require("Hmisc")
+require("plyr")
 
 dec_sent$paper_rejected  <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
@@ -27,6 +28,7 @@ rm(mean.rs)
 # help from UCLA site: http://www.ats.ucla.edu/stat/r/dae/ologit.htm
 
 ftable(xtabs(~ paper_rejected + mean.rs + first_auth_geog, data = dec_sent))
+ftable(xtabs(~ mean.rs + first_auth_geog, data = dec_sent))
 
 m <- polr(mean.rs ~ first_auth_geog, data = dec_sent, Hess = TRUE)
 summary(m, digits = 3)

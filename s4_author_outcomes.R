@@ -19,7 +19,7 @@ reorder_size <- function(x) {
 
 ggplot(dec_sent, aes(x = reorder_size(first_auth_geog), fill = paper_rejected)) +
         geom_bar() + theme_bw() + 
-        scale_fill_grey(name = "Revision Invited / Declined") +
+        scale_fill_grey(name = "Likely Not Published") +
         labs(x = "Geographical Region of First Author",
              y = "Count") +
         theme(axis.text.y = element_text(size = 12,

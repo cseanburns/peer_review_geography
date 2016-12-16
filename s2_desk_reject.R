@@ -42,7 +42,9 @@ reorder_size <- function(x) {
 }
 
 ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
-        geom_bar() + theme_bw() + 
+        geom_bar(aes(y = (..count..)/sum(..count..))) +
+        scale_y_continuous(labels = percent) + theme_bw() +
+        # geom_bar() + theme_bw() + 
         scale_fill_grey(name = "Sent for Review") +
         labs(x = "Geographical Region of First Author",
         y = "Count") +

@@ -1,13 +1,13 @@
 # Libraries needed
 
-#library("aod")
-#library("dplyr")
+library("aod")
+library("dplyr")
 library("ggplot2")
-library("MASS")
-#library("mice")
-#library("plyr")
+#library("MASS")
+library("mice")
+library("plyr")
 #library("pROC")
-#library("reshape2")
+library("reshape2")
 #library("vcd")
 
 ## Unused packages
