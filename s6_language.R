@@ -11,6 +11,16 @@ rm(lang)
 dec_lang$english <- ifelse(dec_lang$language == "English", TRUE, FALSE)
 dec_lang$english <- factor(dec_lang$english, ordered = FALSE)
 
+dec_lang$first_auth_geog <- relevel(dec_lang$first_auth_geog, ref = "Europe")
+dec_lang$english <- relevel(dec_lang$english, ref = "FALSE")
+dec_lang$sent_for_review <- relevel(dec_lang$sent_for_review, ref = "No")
+dec_lang$paper_rejected <- relevel(dec_lang$paper_rejected, ref = "Yes")
+
+contrasts(dec_lang$first_auth_geog)
+contrasts(dec_lang$english)
+contrasts(dec_lang$sent_for_review)
+contrasts(dec_lang$paper_rejected)
+
 fit.0 <- glm(sent_for_review ~ english, family = "binomial", data = dec_lang)
 summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
@@ -25,9 +35,16 @@ chi.df     <- fit.0$df.null - fit.0$df.residual
 chisq.prob <- 1 - pchisq(fit.chi, chi.df) 
 # display results
 fit.chi ; chi.df ; chisq.prob
+rm(fit.0, fit.chi, chi.df, chisq.prob)
 
+# look at proportions
+sum.sent.english <- sum(table(dec_lang$english, dec_lang$sent_for_review))
+round(table(dec_lang$english, dec_lang$sent_for_review) / sum.sent.english, 3) * 100
+chisq.test(table(dec_lang$english, dec_lang$sent_for_review))
+rm(sum.sent.english)
+
+# look at final decision set only
 dec_lang_sent <- filter(dec_lang, sent_for_review == "Yes")
-table(dec_lang_sent$english)
 
 fit.1 <- glm(paper_rejected ~ english, family = "binomial", data = dec_lang_sent)
 summary(fit.1)
@@ -43,38 +60,12 @@ chi.df     <- fit.1$df.null - fit.1$df.residual
 chisq.prob <- 1 - pchisq(fit.chi, chi.df) 
 # display results
 fit.chi ; chi.df ; chisq.prob
+rm(fit.1, fit.chi, chi.df, chisq.prob)
 
-dec_lang$prob <- predict(fit.0, type = c("response"))
-g <- roc(paper_rejected ~ prob, data = dec_lang) ; g
-plot(g)
-
-###
-
-dec_lang$sent_for_review <- relevel(dec_lang$sent_for_review, ref = "No")
-dec_lang$first_auth_geog <- relevel(dec_lang$first_auth_geog, ref = "Europe")
-dec_lang$english <- relevel(dec_lang$english, ref = "TRUE")
-contrasts(dec_lang$sent_for_review)
-contrasts(dec_lang$first_auth_geog)
-contrasts(dec_lang$english)
-
-fit.2 <- glm(sent_for_review ~ first_auth_geog + english,
-             family = "binomial", data = dec_lang)
-summary(fit.2)
-round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
-
-##
-
-dec_lang_sent$paper_rejected <- relevel(dec_lang_sent$paper_rejected,
-                                        ref = "Yes")
-dec_lang_sent$first_auth_geog <- relevel(dec_lang_sent$first_auth_geog,
-                                         ref = "Europe")
-dec_lang_sent$english <- relevel(dec_lang_sent$english, ref = "TRUE")
-
-contrasts(dec_lang_sent$paper_rejected)
-contrasts(dec_lang_sent$first_auth_geog)
-contrasts(dec_lang_sent$english)
-
-fit.3 <- glm(paper_rejected ~ first_auth_geog + english,
-             family = "binomial", data = dec_lang_sent)
-summary(fit.3)
-round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)
+# look at proportions
+sum.final.english <- sum(table(dec_lang_sent$english,
+                               dec_lang_sent$paper_rejected))
+round(table(dec_lang_sent$english, dec_lang_sent$paper_rejected) /
+              sum.final.english, 3) * 100
+chisq.test(table(dec_lang_sent$english, dec_lang_sent$paper_rejected))
+rm(sum.final.english)
