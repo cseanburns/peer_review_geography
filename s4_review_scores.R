@@ -100,4 +100,4 @@ ggplot(t.sdf, aes(x = OR, y = Region)) +
                                          colour = "black")) +
         theme(legend.position = c(0.95,0.85))
 
-rm(dec_sent, mean.rs, ctable, p, ci, sf, s, s.tbl, s.df, n.sdf, s.df, t.sdf) 
+rm(mean.rs, ctable, p, ci, sf, s, s.tbl, s.df, n.sdf, s.df, t.sdf) 

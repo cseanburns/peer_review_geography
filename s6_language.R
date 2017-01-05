@@ -45,6 +45,7 @@ rm(sum.sent.english)
 
 # look at final decision set only
 dec_lang_sent <- filter(dec_lang, sent_for_review == "Yes")
+table(dec_lang_sent$english)
 
 fit.1 <- glm(paper_rejected ~ english, family = "binomial", data = dec_lang_sent)
 summary(fit.1)
@@ -69,3 +70,5 @@ round(table(dec_lang_sent$english, dec_lang_sent$paper_rejected) /
               sum.final.english, 3) * 100
 chisq.test(table(dec_lang_sent$english, dec_lang_sent$paper_rejected))
 rm(sum.final.english)
+
+rm(dec_lang, dec_lang_sent, dec0)

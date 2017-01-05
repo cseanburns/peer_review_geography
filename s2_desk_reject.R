@@ -1,10 +1,11 @@
 source("libraries.R")
 
-# Sent for Review 
-
+# create working copy
 dec0 <- dec
 
+# Sent for Review ; looking at desk rejects in this section
 dec0                 <- select(dec0, sent_for_review, first_auth_geog)
+# remember here that I only imputed first_auth_geog for dec_sent subset
 dec0                 <- filter(dec0, !is.na(first_auth_geog))
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
 dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
@@ -33,6 +34,8 @@ chisq.prob <- 1 - pchisq(fit.chi, chi.df)
 # Display the results
 fit.chi; chi.df; chisq.prob
 
+# Below not used but for exploratory analysis ; primarily for looking at 
+# odds w/o a control/reference group
 author_sent <- table(dec0$sent_for_review, dec0$first_auth_geog)
 author_sent
 round(author_sent[2,]/author_sent[1,],3)

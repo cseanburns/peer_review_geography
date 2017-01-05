@@ -1,9 +1,9 @@
 source("libraries.R")
 
+# create working copy
 dec0 <- dec
 
-###
-
+# create subset from working copy
 dec_review        <- select(dec0, ms_id, mean_review_score, paper_rejected)
 names(dec_review) <- c("ms_id", "mean_review", "paper_rejected")
 dec_review        <- inner_join(author_decisions,
@@ -15,20 +15,33 @@ dec_review$author_institution  <- NULL
 dec_review$author_country      <- gsub("Georgia", "Tbilisi",
                                        dec_review$author_country)
 
-### basic total authorship characteristics
+# geocoding author countries; not using this in the final analysis but it 
+# was useful in exploratory work
+author_country_id <- unique(dec_review$author_country)
+country_id        <- geocode(author_country_id,
+                             output = "latlon",
+                             source = "google")
+country_id$author_country <- author_country_id
+write.table(country_id, file="country_id.txt",
+            quote=TRUE, sep=",",
+            row.names=FALSE)
+rm(author_country_id)
 
+# get basic total authorship characteristics; not explicitly used in manuscript
+# but useful in exploratory analysis
 auth_country_freq        <- sort(table(dec_review$author_country),
                                  decreasing = TRUE)
 auth_country_freq        <- data.frame(auth_country_freq)
 names(auth_country_freq) <- c("Country", "Freq")
 auth_country_freq$ratios <- auth_country_freq$Freq[1] / auth_country_freq$Freq
 auth_country_freq$count  <- seq(1:length(auth_country_freq$Freq))
+auth_country_freq$perc   <- round(auth_country_freq$Freq /
+                                          sum(auth_country_freq$Freq) * 100, 2)
+View(auth_country_freq)
 
 rm(auth_country_freq)
 
 # Geographical differences between first and last authors
-# Table 1 in manuscript
-
 first_author_tbl_1 <- table(dec0$first_auth_geog)
 first_author_tbl_2 <- round(table(dec0$first_auth_geog) /
                                     sum(table(dec0$first_auth_geog)),4) * 100
@@ -44,6 +57,8 @@ chisq.test(first_author_tbl_1, senior_author_tbl_1, simulate.p.value = TRUE)
 first_senior_author_tbl_1 <- table(dec0$first_auth_geog, dec0$senior_auth_geog)
 first_senior_author_tbl_2 <- round(first_senior_author_tbl_1 /
                                            rowSums(first_senior_author_tbl_1),3)
+# this is Table 1 in manuscript
+first_senior_author_tbl_1 ; first_senior_author_tbl_2
 assocstats(first_senior_author_tbl_1)
 
 rm(first_author_tbl_1, first_author_tbl_2)
@@ -51,7 +66,6 @@ rm(senior_author_tbl_1, senior_author_tbl_2)
 rm(first_senior_author_tbl_1, first_senior_author_tbl_2)
 
 # Geographical difference between first and corresponding authors
-
 first_author_tbl_1 <- table(dec0$first_auth_geog)
 first_author_tbl_2 <- round(table(dec0$first_auth_geog) /
                                     sum(table(dec0$first_auth_geog)),4) * 100
@@ -67,6 +81,7 @@ chisq.test(first_author_tbl_1, corr_author_tbl_1, simulate.p.value = TRUE)
 first_corr_author_tbl_1 <- table(dec0$first_auth_geog, dec0$corr_auth_geog)
 first_corr_author_tbl_2 <- round(first_corr_author_tbl_1 /
                                            rowSums(first_corr_author_tbl_1),3)
+first_corr_author_tbl_1 ; first_corr_author_tbl_2
 assocstats(first_corr_author_tbl_1)
 
 rm(first_author_tbl_1, first_author_tbl_2)
@@ -74,7 +89,6 @@ rm(corr_author_tbl_1, corr_author_tbl_2)
 rm(first_corr_author_tbl_1, first_corr_author_tbl_2)
 
 # Geographical difference between first and submitting authors
-
 first_author_tbl_1 <- table(dec0$first_auth_geog)
 first_author_tbl_2 <- round(table(dec0$first_auth_geog) /
                                     sum(table(dec0$first_auth_geog)),4) * 100
@@ -90,19 +104,20 @@ chisq.test(first_author_tbl_1, sub_author_tbl_1, simulate.p.value = TRUE)
 first_sub_author_tbl_1 <- table(dec0$first_auth_geog, dec0$submit_auth_geog)
 first_sub_author_tbl_2 <- round(first_sub_author_tbl_1 /
                                            rowSums(first_sub_author_tbl_1),3)
+first_sub_author_tbl_1 ; first_sub_author_tbl_2
 assocstats(first_sub_author_tbl_1)
 
 rm(first_author_tbl_1, first_author_tbl_2)
 rm(first_sub_author_tbl_1, first_sub_author_tbl_2)
 rm(sub_author_tbl_1, sub_author_tbl_2)
 
-# Set up for Table 2 in manuscript 
-
+# Set up for Table 2 in manuscript; examines co-authorship among top submitting
+# nations
 auth_dec <- melt(dec_review, id.vars = c("ms_id",
                                          "author_order",
                                          "author_country"))
 
-country_id <- read_csv("~/Dropbox/workspace/geography/country_id.csv")
+country_id <- read.csv("~/Dropbox/workspace/geography/country_id.csv")
 auth_dec <- auth_dec %>% left_join(country_id)
 auth_dec <- filter(auth_dec, variable == "corresponding_author")
 
@@ -118,14 +133,9 @@ last_author  <- auth_dec %>% group_by(ms_id) %>%
 
 last_author  <- last_author %>% inner_join(country_id)
 
-# test <- table(auth_dec$ms_id, auth_dec$author_country)
-# test <- as.data.frame(test)
-# test <- filter(test, Freq > 0)
-# names(test) <- c("ms_id", "author_country", "Freq")
-# test <- arrange(test, ms_id)
-
 auth_dec        <- inner_join(first_author, last_author, by = "ms_id")
-names(auth_dec) <- c("ms_id", "first_author", "lon_fa", "lat_fa", "last_author", "lon_la", "lat_la")
+names(auth_dec) <- c("ms_id", "first_author", "lon_fa",
+                     "lat_fa", "last_author", "lon_la", "lat_la")
 auth_dec        <- auth_dec[,-1] # remove ms_id column
 auth_dec        <- data.frame(auth_dec)
 
@@ -163,4 +173,3 @@ rm(auth_freq, first_last_author_stats)
 rm(first_author, last_author)
 
 rm(auth_dec, country_id, dec_review, dec0)
-

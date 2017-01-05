@@ -1,7 +1,7 @@
+source("libraries.R")
+
 # Authors by regions and comparing to paper rejections
 # Focus on data set filtered by sent for review
-
-source("libraries.R")
 
 dec_sent$paper_rejected       <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog      <- relevel(dec_sent$first_auth_geog, ref = "Europe")
@@ -12,6 +12,20 @@ contrasts(dec_sent$first_auth_geog)
 fit.0 <- glm(paper_rejected ~ first_auth_geog, data = dec_sent, family = "binomial")
 summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
+
+# Test the overall effect of the levels
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
+
+# The reduction in the deviance; results in the chi square statistic
+fit.chi     <- fit.0$null.deviance - fit.0$deviance
+# The degrees of freedom for the chi square statistic
+chi.df      <- fit.0$df.null - fit.0$df.residual
+# The probability associated with the chi-square statistic
+# If (e.g.) less than 0.05, we can reject the null hypothesis that the model
+# is not better than chance at predicting the outcome
+chisq.prob  <- 1 - pchisq(fit.chi, chi.df) 
+# display the results
+fit.chi ; chi.df ; chisq.prob
 
 reorder_size <- function(x) {
         factor(x, levels = names(sort(table(x), decreasing = TRUE)))
@@ -28,26 +42,7 @@ ggplot(dec_sent, aes(x = reorder_size(first_auth_geog), fill = paper_rejected)) 
                                          colour = "black")) +
         theme(legend.position = c(.8,.8))
 
-# Test the overall effect of the levels
-wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
-
-# The reduction in the deviance; results in the chi square statistic
-fit.chi     <- fit.0$null.deviance - fit.0$deviance
-# The degrees of freedom for the chi square statistic
-chi.df      <- fit.0$df.null - fit.0$df.residual
-# The probability associated with the chi-square statistic
-# If (e.g.) less than 0.05, we can reject the null hypothesis that the model
-# is not better than chance at predicting the outcome
-chisq.prob  <- 1 - pchisq(fit.chi, chi.df) 
-# display the results
-fit.chi ; chi.df ; chisq.prob
-
-dec_sent$prob   <- predict(fit.0, type = c("response"))
-
-g <- roc(paper_rejected ~ prob, data = dec_sent) ; g
-plot(g)
-
-rm(dec_sent, fit.0, fit.chi, chi.df, chisq.prob, g)
+rm(fit.0, fit.chi, chi.df, chisq.prob)
 
 ### test if multinational authorships are penalized ###
 ### identifies all manuscripts where authors are from the same nation and
