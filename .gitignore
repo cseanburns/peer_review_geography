@@ -6,7 +6,10 @@ geography.Rproj
 author_decisions.csv
 decisions-2.csv
 decisions.csv
+reviewer_geographies.csv
 plots/
 archived_data/
 exploratory_plots/
 exploratory_analyses/
+imputation/
+reviewer_countries.csv

@@ -52,7 +52,10 @@ rm(fit.0, fit.chi, chi.df, chisq.prob)
 # create new dataframe with manuscript IDs, paper rejection status, and author
 # country.
 dec_handling_editors <- select(dec_sent, ms_id, paper_rejected)
-dec_author_country   <- select(author_decisions, ms_id, author_country)
+
+dec_handling_editors <- dec %>% filter(sent_for_review == "Yes") %>%
+        select(ms_id, paper_rejected)
+dec_author_country   <- author_decisions %>% select(ms_id, author_country)
 dec_mixed_countries  <- inner_join(dec_handling_editors,
                                    dec_author_country,
                                    by = "ms_id")

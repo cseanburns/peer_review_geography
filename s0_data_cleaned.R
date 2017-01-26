@@ -1,95 +1,7 @@
 source("libraries.R")
 
-### Read in the main data set
-dec <- read.csv("decisions-2.csv")
-
-# create submission year variable from the manuscript ID number
-dec$submit_year <- substr(dec$ms_id, 1, 4)
-dec$submit_year <- as.numeric(dec$submit_year)
-
-# select key variables to study; not going to use all of these
-dec <- select(dec, ms_id, first_auth_geog, corr_auth_geog, submit_auth_geog,
-              senior_auth_geog, handling_editor_geog, mean_review_score,
-              mean_reviewer_days_respond, mean_reviewer_days_review,
-              prop_reviewers_responding, prop_reviewers_agreeing,
-              sent_for_review, paper_rejected, no_reviews_obtained,
-              no_reviewers_responded, time_to_decision, submit_year)
-
-# filter out manuscripts that were sent for review from those that weren't
-dec_sent <- filter(dec, sent_for_review == 1)
-dec_unsent <- filter(dec, sent_for_review == 0)
-
-# select variables for imputing; mainly selecting all variables but only a few 
-# variables that are being studied are missing values
-simple <- select(dec_sent, first_auth_geog, corr_auth_geog, submit_auth_geog,
-                 senior_auth_geog, handling_editor_geog, mean_review_score,
-                 mean_reviewer_days_respond, mean_reviewer_days_review,
-                 prop_reviewers_responding, prop_reviewers_agreeing,
-                 no_reviews_obtained, no_reviewers_responded, time_to_decision,
-                 paper_rejected)
-
-# set seed and impute variables only for sent_for_review is true
-imputed <- complete(mice(simple, seed = 23))
-
-# save imputed variables
-dec_sent$first_auth_geog            <- imputed$first_auth_geog
-dec_sent$corr_auth_geog             <- imputed$corr_auth_geog
-dec_sent$submit_auth_geog           <- imputed$submit_auth_geog
-dec_sent$senior_auth_geog           <- imputed$senior_auth_geog
-dec_sent$handling_editor_geog       <- imputed$handling_editor_geog
-dec_sent$mean_review_score          <- imputed$mean_review_score
-dec_sent$mean_reviewer_days_respond <- imputed$mean_reviewer_days_respond
-dec_sent$mean_reviewer_days_review  <- imputed$mean_reviewer_days_review
-dec_sent$prop_reviewers_responding  <- imputed$prop_reviewers_responding
-dec_sent$prop_reviewers_agreeing    <- imputed$prop_reviewers_agreeing
-dec_sent$no_reviews_obtained        <- imputed$no_reviews_obtained
-dec_sent$no_reviewers_responded     <- imputed$no_reviewers_responded
-dec_sent$time_to_decision           <- imputed$time_to_decision
-dec_sent$paper_rejected             <- imputed$paper_rejected
-
-# convert to factors; sent for review
-dec_sent$first_auth_geog      <- factor(dec_sent$first_auth_geog, ordered = FALSE)
-dec_sent$corr_auth_geog       <- factor(dec_sent$corr_auth_geog, ordered = FALSE)
-dec_sent$senior_auth_geog     <- factor(dec_sent$senior_auth_geog, ordered = FALSE)
-dec_sent$handling_editor_geog <- factor(dec_sent$handling_editor_geog, ordered = FALSE)
-dec_sent$submit_auth_geog     <- factor(dec_sent$submit_auth_geog, ordered = FALSE)
-dec_sent$submit_year          <- factor(dec_sent$submit_year, ordered = FALSE)
-dec_sent$sent_for_review      <- factor(dec_sent$sent_for_review,
-                                        levels = c("0", "1"),
-                                        labels = c("No", "Yes"),
-                                        ordered = FALSE)
-# NOTE that the 1 and 0 are reverse order
-dec_sent$paper_rejected       <- factor(dec_sent$paper_rejected,
-                                        levels = c("1", "0"),
-                                        labels = c("Yes", "No"),
-                                        ordered = FALSE)
-
-# convert to factors; not sent for review
-dec_unsent$first_auth_geog      <- factor(dec_unsent$first_auth_geog, ordered = FALSE)
-dec_unsent$corr_auth_geog       <- factor(dec_unsent$corr_auth_geog, ordered = FALSE)
-dec_unsent$submit_auth_geog     <- factor(dec_unsent$submit_auth_geog, ordered = FALSE)
-dec_unsent$senior_auth_geog     <- factor(dec_unsent$senior_auth_geog, ordered = FALSE)
-dec_unsent$handling_editor_geog <- factor(dec_unsent$handling_editor_geog, ordered = FALSE)
-dec_unsent$submit_auth_geog     <- factor(dec_unsent$submit_auth_geog, ordered = FALSE)
-dec_unsent$submit_year          <- factor(dec_unsent$submit_year, ordered = FALSE)
-dec_unsent$sent_for_review      <- factor(dec_unsent$sent_for_review,
-                                          levels = c("0", "1"),
-                                          labels = c("No", "Yes"),
-                                          ordered = FALSE)
-# NOTE reverse order
-dec_unsent$paper_rejected       <- factor(dec_unsent$paper_rejected,
-                                          levels = c("1", "0"),
-                                          labels = c("Yes", "No"),
-                                          ordered = FALSE)
-
-# recombine the sent and unsent data sets but don't remove the partitioned sets
-dec <- rbind(dec_sent, dec_unsent)
-
-rm(imputed, simple)
-
-### Author decisions data; data is mostly the same but there is some additional
-### information here and the data is organized differently
-
+### Author decisions data; data is mostly the same as decisions data but there
+### is some additional information here and the data is organized differently
 # read in data set
 author_decisions <- read.csv("author_decisions.csv")
 
@@ -123,3 +35,106 @@ author_decisions$author_country <- as.character(author_decisions$author_country)
 author_decisions$final_decision <- NULL
 
 author_decisions$submit_date <- as.Date(as.character(author_decisions$submit_date))
+
+### Read in the main data set; similar to above but some new info and different
+### format
+dec <- read.csv("decisions-2.csv")
+
+# # Helps to get count of authors per paper
+author_data <- inner_join(author_decisions, dec, by = "ms_id")
+
+author_data <- select(author_data, ms_id, submit_year, author_order,
+                      corresponding_author, submitting_author, senior_author,
+                      missing_authors, author_country, HDI, language,
+                      geographic_region, author_count, corr_auth_first_auth,
+                      corr_auth_first_auth, submit_auth_first_auth,
+                      submit_auth_senior_auth, corr_auth_senior_auth,
+                      first_auth_geog, corr_auth_geog, submit_auth_geog,
+                      senior_auth_geog, handling_editor, handling_editor_geog,
+                      editor_seniority, editor_years, mean_review_score, 
+                      prop_reviewers_responding, prop_reviewers_agreeing,
+                      sent_for_review, paper_rejected)
+
+author_data_max <- author_data %>%
+        group_by(ms_id) %>%
+        filter(author_order==max(author_order))
+
+author_data_max$author_count <- author_data_max$author_order
+author_data_max$author_order <- NULL
+
+# Remove all papers w/ single authors
+author_data_max <- author_data_max %>% filter(author_count > 1)
+
+# Convert language to English logical value
+author_data_max$english <- author_data_max$language == "English"
+
+dec <- author_data_max
+
+rm(author_data, author_data_max)
+
+# convert to factors; sent for review
+
+dec$corr_auth_first_auth <- factor(dec$corr_auth_first_auth,
+                                   levels = c("0", "1"),
+                                   labels = c("No", "Yes"),
+                                   ordered = FALSE)
+dec$submit_auth_first_auth <- factor(dec$submit_auth_first_auth,
+                                     levels = c("0", "1"),
+                                     labels = c("No", "Yes"),
+                                     ordered = FALSE)
+dec$submit_auth_senior_auth <- factor(dec$submit_auth_senior_auth,
+                                      levels = c("0", "1"),
+                                      labels = c("No", "Yes"),
+                                      ordered = FALSE)
+dec$corr_auth_senior_auth <- factor(dec$corr_auth_senior_auth,
+                                    levels = c("0", "1"),
+                                    labels = c("No", "Yes"),
+                                    ordered = FALSE)
+
+dec$first_auth_geog      <- factor(dec$first_auth_geog, ordered = FALSE)
+dec$corr_auth_geog       <- factor(dec$corr_auth_geog, ordered = FALSE)
+dec$senior_auth_geog     <- factor(dec$senior_auth_geog, ordered = FALSE)
+dec$handling_editor_geog <- factor(dec$handling_editor_geog, ordered = FALSE)
+dec$submit_auth_geog     <- factor(dec$submit_auth_geog, ordered = FALSE)
+dec$submit_year          <- factor(dec$submit_year, ordered = FALSE)
+dec$sent_for_review      <- factor(dec$sent_for_review,
+                                       levels = c("0", "1"),
+                                       labels = c("No", "Yes"),
+                                       ordered = FALSE)
+
+# NOTE that the 1 and 0 are reverse order
+dec$paper_rejected       <- factor(dec$paper_rejected,
+                                       levels = c("1", "0"),
+                                       labels = c("Yes", "No"),
+                                       ordered = FALSE)
+
+# authors per paper
+  
+auth_tmp <- author_decisions %>% select(ms_id, author_country,
+                                   geographic_region, language, author_order)
+auth_tmp <- auth_tmp %>% arrange(ms_id, author_order)
+
+auth_tmp <- select(auth_tmp, ms_id, author_country, author_order)
+
+auth_tmp <- auth_tmp %>% select(ms_id, author_country)
+auth_tmp <- distinct(auth_tmp)
+auth_tmp$mixed <- duplicated(auth_tmp$ms_id)
+
+mixed.true  <- auth_tmp %>% filter(mixed == TRUE)
+mixed.false <- auth_tmp %>% filter(mixed == FALSE)
+
+mixed.true$author_country  <- NULL
+mixed.false$author_country <- NULL
+
+mixed.false.logic <- mixed.false[!(mixed.false$ms_id %in% mixed.true$ms_id),]
+mixed.combined    <- rbind(mixed.true, mixed.false.logic)
+mixed.combined    <- unique(mixed.combined)
+
+auth_tmp <- inner_join(mixed.combined, dec, by="ms_id")
+auth_tmp <- auth_tmp %>% arrange(ms_id)
+
+dec <- auth_tmp
+
+# note that FALSE for dec$mixed means all authors are from the same country
+
+rm(auth_tmp, mixed.true, mixed.false, mixed.false.logic, mixed.combined)

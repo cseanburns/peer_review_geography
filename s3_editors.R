@@ -14,7 +14,8 @@ table(dec_sent$first_auth_geog) ; table(dec_sent$handling_editor_geog)
 round(table(dec_sent$first_auth_geog) / table(dec_sent$handling_editor_geog),2)
 round(table(dec_sent$handling_editor_geog) / table(dec_sent$first_auth_geog),2)
 author.editor.tbl <- table(dec_sent$first_auth_geog, dec_sent$handling_editor_geog)
-assocstats(author.editor.tbl) ; rm(author.editor.tbl)
+assocstats(author.editor.tbl)
+rm(author.editor.tbl)
 
 dec_sent$paper_rejected       <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$handling_editor_geog <- relevel(dec_sent$handling_editor_geog,
