@@ -114,8 +114,6 @@ dec$paper_rejected       <- factor(dec$paper_rejected,
 # get counts of authors per paper; and create variable noting whether authors
 # are from different countries or the same country
   
-# note that FALSE for dec$mixed means all authors are from the same country
-
 auth_tmp <- author_decisions %>% select(ms_id, author_country,
                                    geographic_region, language, author_order)
 auth_tmp <- auth_tmp %>% arrange(ms_id, author_order)
@@ -125,6 +123,8 @@ auth_tmp <- select(auth_tmp, ms_id, author_country, author_order)
 auth_tmp <- auth_tmp %>% select(ms_id, author_country)
 auth_tmp <- distinct(auth_tmp)
 auth_tmp$mixed <- duplicated(auth_tmp$ms_id)
+
+# note that FALSE for dec$mixed means all authors are from the same country
 
 mixed.true  <- auth_tmp %>% filter(mixed == TRUE)
 mixed.false <- auth_tmp %>% filter(mixed == FALSE)
@@ -140,5 +140,8 @@ auth_tmp <- inner_join(mixed.combined, dec, by="ms_id")
 auth_tmp <- auth_tmp %>% arrange(ms_id)
 
 dec <- auth_tmp
+dec$mixed <- dec$mixed.x
+dec$mixed.x <- NULL
+dec$mixed.y <- NULL
 
 rm(auth_tmp, mixed.true, mixed.false, mixed.false.logic, mixed.combined)
