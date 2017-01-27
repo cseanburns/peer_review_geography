@@ -1,8 +1,23 @@
 source("libraries.R")
 
+# Create working copy
 dec0 <- dec
 
+# most first authors are corresponding authors
+table(dec0$corr_auth_first_auth) / sum(table(dec0$corr_auth_first_auth))
+# most first authors are submitting authors
+table(dec0$submit_auth_first_auth) / sum(table(dec0$submit_auth_first_auth))
+
 # Geographical differences between first and last authors
+# cross-tabulation of first and last author geographies; ratios are computed
+# across the entire table (sum =~ 100% for all ratios)
+round(table(dec0$first_auth_geog, dec0$senior_auth_geog) /
+              sum(table(dec0$first_auth_geog, dec0$senior_auth_geog)), 3)
+
+table(dec0$mixed) / sum(table(dec0$mixed))
+
+# prepping for cross-tabulation of first and last author geographies; ratios are
+# computed by row
 first_author_tbl_1 <- table(dec0$first_auth_geog)
 first_author_tbl_2 <- round(table(dec0$first_auth_geog) /
                                     sum(table(dec0$first_auth_geog)),4) * 100
@@ -12,8 +27,6 @@ senior_author_tbl_1 <- table(dec0$senior_auth_geog)
 senior_author_tbl_2 <- round(table(dec0$senior_auth_geog) /
                                      sum(table(dec0$senior_auth_geog)),4) * 100
 senior_author_tbl_1 ; senior_author_tbl_2
-
-chisq.test(first_author_tbl_1, senior_author_tbl_1, simulate.p.value = TRUE)
 
 first_senior_author_tbl_1 <- table(dec0$first_auth_geog, dec0$senior_auth_geog)
 first_senior_author_tbl_2 <- round(first_senior_author_tbl_1 /
@@ -37,8 +50,6 @@ corr_author_tbl_2 <- round(table(dec0$corr_auth_geog) /
                                    sum(table(dec0$corr_auth_geog)),4) * 100
 corr_author_tbl_1 ; corr_author_tbl_2
 
-chisq.test(first_author_tbl_1, corr_author_tbl_1, simulate.p.value = TRUE)
-
 first_corr_author_tbl_1 <- table(dec0$first_auth_geog, dec0$corr_auth_geog)
 first_corr_author_tbl_2 <- round(first_corr_author_tbl_1 /
                                            rowSums(first_corr_author_tbl_1),3)
@@ -59,8 +70,6 @@ sub_author_tbl_1 <- table(dec0$submit_auth_geog)
 sub_author_tbl_2 <- round(table(dec0$submit_auth_geog) /
                                   sum(table(dec0$submit_auth_geog)),4) * 100
 sub_author_tbl_1 ; sub_author_tbl_2
-
-chisq.test(first_author_tbl_1, sub_author_tbl_1, simulate.p.value = TRUE)
 
 first_sub_author_tbl_1 <- table(dec0$first_auth_geog, dec0$submit_auth_geog)
 first_sub_author_tbl_2 <- round(first_sub_author_tbl_1 /
