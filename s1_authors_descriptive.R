@@ -15,6 +15,8 @@ round(table(dec0$first_auth_geog, dec0$senior_auth_geog) /
               sum(table(dec0$first_auth_geog, dec0$senior_auth_geog)), 3)
 
 table(dec0$mixed) / sum(table(dec0$mixed))
+summary(dec0$author_count)
+table(dec0$author_count)
 
 # prepping for cross-tabulation of first and last author geographies; ratios are
 # computed by row
