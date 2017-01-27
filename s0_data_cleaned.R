@@ -1,5 +1,11 @@
 source("libraries.R")
 
+### There are two data sets: author_decisions.csv and decisons.csv. Both
+### datasets are largely equivalent, but the author_decisions.csv data contains
+### multiple observations for each author per manuscript, and the decicions.csv
+### data is condensed. I also added the HDI and language variables and
+### observations to the author_decisions.csv data.
+
 ### Author decisions data; data is mostly the same as decisions data but there
 ### is some additional information here and the data is organized differently
 # read in data set
