@@ -6,9 +6,7 @@ source("libraries.R")
 ### data is condensed. I also added the HDI and language variables and
 ### observations to the author_decisions.csv data.
 
-### Author decisions data; data is mostly the same as decisions data but there
-### is some additional information here and the data is organized differently
-# read in data set
+### Author decisions data; non-condensed format
 author_decisions <- read.csv("author_decisions.csv")
 
 # set variables to proper types
@@ -42,8 +40,7 @@ author_decisions$final_decision <- NULL
 
 author_decisions$submit_date <- as.Date(as.character(author_decisions$submit_date))
 
-### Read in the main data set; similar to above but some new info and different
-### format
+### Author decisions data; condensed format
 dec <- read.csv("decisions-2.csv")
 
 # # Helps to get count of authors per paper
@@ -68,7 +65,7 @@ author_data_max <- author_data %>%
 author_data_max$author_count <- author_data_max$author_order
 author_data_max$author_order <- NULL
 
-# Remove all papers w/ single authors
+# Remove all papers w/ single authors (we're looking at collaborations)
 author_data_max <- author_data_max %>% filter(author_count > 1)
 
 # Convert language to English logical value
@@ -78,7 +75,7 @@ dec <- author_data_max
 
 rm(author_data, author_data_max)
 
-# convert to factors; sent for review
+# convert to factors
 
 dec$corr_auth_first_auth <- factor(dec$corr_auth_first_auth,
                                    levels = c("0", "1"),
@@ -114,8 +111,11 @@ dec$paper_rejected       <- factor(dec$paper_rejected,
                                        labels = c("Yes", "No"),
                                        ordered = FALSE)
 
-# authors per paper
+# get counts of authors per paper; and create variable noting whether authors
+# are from different countries or the same country
   
+# note that FALSE for dec$mixed means all authors are from the same country
+
 auth_tmp <- author_decisions %>% select(ms_id, author_country,
                                    geographic_region, language, author_order)
 auth_tmp <- auth_tmp %>% arrange(ms_id, author_order)
@@ -140,7 +140,5 @@ auth_tmp <- inner_join(mixed.combined, dec, by="ms_id")
 auth_tmp <- auth_tmp %>% arrange(ms_id)
 
 dec <- auth_tmp
-
-# note that FALSE for dec$mixed means all authors are from the same country
 
 rm(auth_tmp, mixed.true, mixed.false, mixed.false.logic, mixed.combined)
