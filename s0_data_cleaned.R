@@ -125,6 +125,7 @@ auth_tmp <- distinct(auth_tmp)
 auth_tmp$mixed <- duplicated(auth_tmp$ms_id)
 
 # note that FALSE for dec$mixed means all authors are from the same country
+# note that TRUE for dec$mixed means authors are from separate countries
 
 mixed.true  <- auth_tmp %>% filter(mixed == TRUE)
 mixed.false <- auth_tmp %>% filter(mixed == FALSE)
@@ -140,8 +141,5 @@ auth_tmp <- inner_join(mixed.combined, dec, by="ms_id")
 auth_tmp <- auth_tmp %>% arrange(ms_id)
 
 dec <- auth_tmp
-dec$mixed <- dec$mixed.x
-dec$mixed.x <- NULL
-dec$mixed.y <- NULL
 
 rm(auth_tmp, mixed.true, mixed.false, mixed.false.logic, mixed.combined)
