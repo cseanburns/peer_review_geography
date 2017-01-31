@@ -3,13 +3,16 @@ source("libraries.R")
 # Editors by geographic regions, comparing to paper rejections 
 # Focus on sent for review data and not all data
 
-# Get ratio of handling editors by region
+dec0 <- dec
+dec_sent <- filter(dec0, sent_for_review == "Yes")
+
+# Get percentage of handling editors by region
 sort(table(dec_sent$handling_editor_geog), decreasing = TRUE)
 sort(round(table(dec_sent$handling_editor_geog) /
                    sum(table(dec_sent$handling_editor_geog)),3),
      decreasing = TRUE)
 
-# Get ratio of author geographies to handling editor geographies
+# Get percentage of author geographies to handling editor geographies
 table(dec_sent$first_auth_geog) ; table(dec_sent$handling_editor_geog)
 round(table(dec_sent$first_auth_geog) / table(dec_sent$handling_editor_geog),2)
 round(table(dec_sent$handling_editor_geog) / table(dec_sent$first_auth_geog),2)
@@ -42,22 +45,22 @@ chisq.prob  <- 1 - pchisq(fit.chi, chi.df)
 # Display the results
 fit.chi ; chi.df ; chisq.prob
 
-dec_tmp <- select(dec_sent, handling_editor_geog, paper_rejected)
-table(dec_tmp)
+# dec_tmp <- select(dec_sent, handling_editor_geog, paper_rejected)
+# table(dec_tmp)
+# 
+# reorder_size <- function(x) {
+#         factor(x, levels = names(sort(table(x), decreasing = TRUE)))
+# }
+# 
+# ggplot(dec_tmp, aes(x = reorder_size(handling_editor_geog), fill = paper_rejected)) +
+#         geom_bar(stat = "count") + theme_bw() +
+#         scale_fill_grey(name = "Revision Invited / Declined") +
+#         labs(x = "Geographical Region of Handling Editor",
+#         y = "Count") +
+#         theme(axis.text.y = element_text(size = 12,
+#                                     colour = "black")) +
+#         theme(axis.text.x = element_text(size = 12,
+#                                     colour = "black")) +
+#         theme(legend.position = c(.8,.8))
 
-reorder_size <- function(x) {
-        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
-}
-
-ggplot(dec_tmp, aes(x = reorder_size(handling_editor_geog), fill = paper_rejected)) +
-        geom_bar(stat = "count") + theme_bw() +
-        scale_fill_grey(name = "Revision Invited / Declined") +
-        labs(x = "Geographical Region of Handling Editor",
-        y = "Count") +
-        theme(axis.text.y = element_text(size = 12,
-                                    colour = "black")) +
-        theme(axis.text.x = element_text(size = 12,
-                                    colour = "black")) +
-        theme(legend.position = c(.8,.8))
-
-rm(fit.0, fit.chi, chi.df, chisq.prob, dec_tmp)
+rm(fit.0, fit.chi, chi.df, chisq.prob)
