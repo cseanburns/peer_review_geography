@@ -36,25 +36,25 @@ fit.chi; chi.df; chisq.prob
 
 # Below not used but for exploratory analysis ; primarily for looking at 
 # odds w/o a control/reference group
-author_sent <- table(dec0$sent_for_review, dec0$first_auth_geog)
-author_sent
-round(author_sent[2,]/author_sent[1,],3)
+# author_sent <- table(dec0$sent_for_review, dec0$first_auth_geog)
+# author_sent
+# round(author_sent[2,]/author_sent[1,],3)
 
-reorder_size <- function(x) {
-        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
-}
-
-ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
-        geom_bar(aes(y = (..count..)/sum(..count..))) +
-        scale_y_continuous(labels = percent) + theme_bw() +
-        # geom_bar() + theme_bw() + 
-        scale_fill_grey(name = "Sent for Review") +
-        labs(x = "Geographical Region of First Author",
-        y = "Count") +
-        theme(axis.text.y = element_text(size = 12,
-                                    colour = "black")) +
-        theme(axis.text.x = element_text(size = 12,
-                                    colour = "black")) +
-        theme(legend.position = c(.8,.8))
+# reorder_size <- function(x) {
+#         factor(x, levels = names(sort(table(x), decreasing = TRUE)))
+# }
+# 
+# ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
+#         geom_bar(aes(y = (..count..)/sum(..count..))) +
+#         scale_y_continuous(labels = percent) + theme_bw() +
+#         # geom_bar() + theme_bw() + 
+#         scale_fill_grey(name = "Sent for Review") +
+#         labs(x = "Geographical Region of First Author",
+#         y = "Count") +
+#         theme(axis.text.y = element_text(size = 12,
+#                                     colour = "black")) +
+#         theme(axis.text.x = element_text(size = 12,
+#                                     colour = "black")) +
+#         theme(legend.position = c(.8,.8))
 
 rm(dec0, fit.0, fit.chi, chi.df, chisq.prob, author_sent)
