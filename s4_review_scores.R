@@ -9,15 +9,12 @@ require("plyr")
 require("dplyr")
 
 dec_sent <- dplyr::filter(dec, sent_for_review == "Yes")
-dec_sent <- dplyr::select(dec_sent, mean_review_score, paper_rejected,
-                          first_auth_geog)
+dec_sent <- dplyr::select(dec_sent, mean_review_score, first_auth_geog)
 
-dec_sent$paper_rejected  <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
 # remove rows with NAs
 dec_sent <- dec_sent[complete.cases(dec_sent),]
 
-contrasts(dec_sent$paper_rejected)
 contrasts(dec_sent$first_auth_geog)
 
 plot(density(dec_sent$mean_review_score, na.rm = TRUE))
@@ -30,7 +27,9 @@ mean.rs <- revalue(mean.rs, c("(0.997,2]" = "1",
 
 mean.rs <- factor(mean.rs, labels = c("Low", "Middle", "High"))
 dec_sent$mean.rs <- mean.rs
+
 rm(mean.rs)
+
 contrasts(dec_sent$mean.rs)
 
 # help from UCLA site: http://www.ats.ucla.edu/stat/r/dae/ologit.htm
