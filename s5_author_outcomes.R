@@ -1,16 +1,22 @@
 source("libraries.R")
 
+dec_sent <- filter(dec, sent_for_review == "Yes")
+dec_sent <- select(dec_sent, ms_id, paper_rejected, first_auth_geog)
+
 # Authors by regions and comparing to paper rejections
 # Focus on data set filtered by sent for review
 
 dec_sent$paper_rejected       <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog      <- relevel(dec_sent$first_auth_geog, ref = "Europe")
 
+# remove rows with NAs
+dec_sent <- dec_sent[complete.cases(dec_sent),]
+
 contrasts(dec_sent$paper_rejected)
 contrasts(dec_sent$first_auth_geog)
 
 fit.0 <- glm(paper_rejected ~ first_auth_geog, data = dec_sent, family = "binomial")
-summary(fit.0)
+summary(fit.0, digits = 3)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
 # Test the overall effect of the levels
@@ -42,16 +48,17 @@ ggplot(dec_sent, aes(x = reorder_size(first_auth_geog), fill = paper_rejected)) 
                                          colour = "black")) +
         theme(legend.position = c(.8,.8))
 
-rm(fit.0, fit.chi, chi.df, chisq.prob)
+rm(fit.0, fit.chi, chi.df, chisq.prob, dec_sent)
 
 ### test if multinational authorships are penalized ###
 ### identifies all manuscripts where authors are from the same nation and
 ### authors are from different nations
 ### need to remove single authorships ###
+### mixed.combined$mixed = FALSE, means that authors are located in same country
+### mixed.combined$mixed = TRUE, means that authors are located in different countries
 
 # create new dataframe with manuscript IDs, paper rejection status, and author
 # country.
-dec_handling_editors <- select(dec_sent, ms_id, paper_rejected)
 
 dec_handling_editors <- dec %>% filter(sent_for_review == "Yes") %>%
         select(ms_id, paper_rejected)
@@ -87,8 +94,34 @@ singles <- singles.df$singles.df
 
 mixed.combined <- mixed.combined[!(mixed.combined$ms_id %in% singles),]
 
+rm(mixed.false, mixed.false.logic, mixed.true, singles.df)
+
 # run chi square test on mixed authorship and then on rejection status
 chisq.test(table(mixed.combined$mixed))
 chisq.test(table(mixed.combined$paper_rejected, mixed.combined$mixed))
 
-rm(mixed.true, mixed.false, mixed.false.logic, singles, singles.df, mixed.combined)
+# regression
+table(mixed.combined$mixed, mixed.combined$paper_rejected)
+mixed.combined$mixed <- as.factor(mixed.combined$mixed)
+mixed.combined$paper_rejected <- relevel(mixed.combined$paper_rejected, ref = "Yes")
+mixed.combined$mixed          <- relevel(mixed.combined$mixed, ref = "FALSE")
+contrasts(mixed.combined$paper_rejected)
+contrasts(mixed.combined$mixed)
+
+fit.0 <- glm(paper_rejected ~ mixed,
+             data = mixed.combined, family = "binomial")
+summary(fit.0)
+round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
+
+# The reduction in the deviance; results in the chi square statistic
+fit.chi <- fit.0$null.deviance - fit.0$deviance
+# The degrees of freedom for the chi square statistic
+chi.df  <- fit.0$df.null - fit.0$df.residual
+# The probability associated with the chi-square statistic; If (e.g.) less than
+# 0.05, we can reject the null hypothesis that the model is not better than
+# chance at predicting the outcome
+chisq.prob <- 1 - pchisq(fit.chi, chi.df)
+# Display the results
+fit.chi; chi.df; chisq.prob
+
+rm(mixed.combined, chi.df, chisq.prob, fit.0, fit.chi, singles)
