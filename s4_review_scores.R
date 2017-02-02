@@ -8,8 +8,7 @@ require("Hmisc")
 require("plyr")
 require("dplyr")
 
-dec0 <- dec
-dec_sent <- dplyr::filter(dec0, sent_for_review == "Yes")
+dec_sent <- dplyr::filter(dec, sent_for_review == "Yes")
 dec_sent <- dplyr::select(dec_sent, mean_review_score, paper_rejected,
                           first_auth_geog)
 
