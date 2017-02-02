@@ -6,14 +6,22 @@ require("ggplot2")
 require("MASS")
 require("Hmisc")
 require("plyr")
+require("dplyr")
+
+dec0 <- dec
+dec_sent <- dplyr::filter(dec0, sent_for_review == "Yes")
+dec_sent <- dplyr::select(dec_sent, mean_review_score, paper_rejected,
+                          first_auth_geog)
 
 dec_sent$paper_rejected  <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
+# remove rows with NAs
+dec_sent <- dec_sent[complete.cases(dec_sent),]
 
 contrasts(dec_sent$paper_rejected)
 contrasts(dec_sent$first_auth_geog)
 
-plot(density(dec_sent$mean_review_score))
+plot(density(dec_sent$mean_review_score, na.rm = TRUE))
 plot(cut(dec_sent$mean_review_score, breaks = 3))
 
 mean.rs <- cut(dec_sent$mean_review_score, breaks = 3)
@@ -24,11 +32,14 @@ mean.rs <- revalue(mean.rs, c("(0.997,2]" = "1",
 mean.rs <- factor(mean.rs, labels = c("Low", "Middle", "High"))
 dec_sent$mean.rs <- mean.rs
 rm(mean.rs)
+contrasts(dec_sent$mean.rs)
 
 # help from UCLA site: http://www.ats.ucla.edu/stat/r/dae/ologit.htm
 
-ftable(xtabs(~ paper_rejected + mean.rs + first_auth_geog, data = dec_sent))
 ftable(xtabs(~ mean.rs + first_auth_geog, data = dec_sent))
+
+p <- ggplot(dec_sent, aes(x = first_auth_geog, y = mean_review_score))
+p + geom_boxplot() + geom_jitter(size = 0.75)
 
 m <- polr(mean.rs ~ first_auth_geog, data = dec_sent, Hess = TRUE)
 summary(m, digits = 3)
@@ -36,17 +47,18 @@ summary(m, digits = 3)
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
 (ci <- confint(m))
-exp(coef(m))
-exp(cbind(OR = coef(m), ci))
+# exp(coef(m))
+round(exp(cbind(OR = coef(m), ci)), 3)
 sf <- function(y) {
         c('Y>=1' = qlogis(mean(y >= 1)),
           'Y>=2' = qlogis(mean(y >= 2)),
           'Y>=3' = qlogis(mean(y >= 3)))
 }
-(s <- with(dec_sent, summary(as.numeric(mean.rs) ~ first_auth_geog, fun = sf)))
+round(s <- with(dec_sent,
+                summary(as.numeric(mean.rs) ~ first_auth_geog, fun = sf)),3)
 
 ggplot(as.data.frame(table(m$model)),
-       aes(x = first_auth_geog, y = sort(Freq, decreasing = TRUE), fill = mean.rs)) +
+       aes(x = first_auth_geog, y = Freq, fill = mean.rs)) +
        geom_bar(stat="identity") + scale_fill_grey(name = "Review Score") +
        theme_bw() +
        labs(x = "Geographic Region of First Author",
@@ -65,9 +77,8 @@ plot(s, which=1:3, pch=1:3,
 s.tbl <- as.table(s)
 s.tbl <- s.tbl[1,]
 s.df  <- data.frame(s.tbl)
-library(dplyr)
-s.df  <- filter(s.df, Var2 != "Y>=1" & Var2 != "N")
-s.df  <- filter(s.df, Var1 != "Europe")
+s.df  <- dplyr::filter(s.df, Var2 != "Y>=1" & Var2 != "N")
+s.df  <- dplyr::filter(s.df, Var1 != "Europe")
 names(s.df) <- c("Region", "Level", "OR")
 
 n.sdf           <- data.frame(exp(coef(m)))
@@ -100,4 +111,4 @@ ggplot(t.sdf, aes(x = OR, y = Region)) +
                                          colour = "black")) +
         theme(legend.position = c(0.95,0.85))
 
-rm(mean.rs, ctable, p, ci, sf, s, s.tbl, s.df, n.sdf, s.df, t.sdf) 
+rm(ci, ctable, n.sdf, s.df, t.sdf, Level, m, p, s, s.tbl, sf)
