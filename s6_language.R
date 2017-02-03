@@ -69,6 +69,6 @@ sum.final.english <- sum(table(dec_lang_sent$english,
 round(table(dec_lang_sent$english, dec_lang_sent$paper_rejected) /
               sum.final.english, 3) * 100
 chisq.test(table(dec_lang_sent$english, dec_lang_sent$paper_rejected))
-rm(sum.final.english)
+rm(sum.sent.english, sum.final.english)
 
 rm(dec_lang, dec_lang_sent, dec0)
