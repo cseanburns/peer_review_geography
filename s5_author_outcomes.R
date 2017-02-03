@@ -33,20 +33,20 @@ chisq.prob  <- 1 - pchisq(fit.chi, chi.df)
 # display the results
 fit.chi ; chi.df ; chisq.prob
 
-reorder_size <- function(x) {
-        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
-}
-
-ggplot(dec_sent, aes(x = reorder_size(first_auth_geog), fill = paper_rejected)) +
-        geom_bar() + theme_bw() + 
-        scale_fill_grey(name = "Likely Not Published") +
-        labs(x = "Geographical Region of First Author",
-             y = "Count") +
-        theme(axis.text.y = element_text(size = 12,
-                                         colour = "black")) +
-        theme(axis.text.x = element_text(size = 12,
-                                         colour = "black")) +
-        theme(legend.position = c(.8,.8))
+# reorder_size <- function(x) {
+#         factor(x, levels = names(sort(table(x), decreasing = TRUE)))
+# }
+# 
+# ggplot(dec_sent, aes(x = reorder_size(first_auth_geog), fill = paper_rejected)) +
+#         geom_bar() + theme_bw() + 
+#         scale_fill_grey(name = "Likely Not Published") +
+#         labs(x = "Geographical Region of First Author",
+#              y = "Count") +
+#         theme(axis.text.y = element_text(size = 12,
+#                                          colour = "black")) +
+#         theme(axis.text.x = element_text(size = 12,
+#                                          colour = "black")) +
+#         theme(legend.position = c(.8,.8))
 
 rm(fit.0, fit.chi, chi.df, chisq.prob, dec_sent)
 
@@ -124,4 +124,19 @@ chisq.prob <- 1 - pchisq(fit.chi, chi.df)
 # Display the results
 fit.chi; chi.df; chisq.prob
 
-rm(mixed.combined, chi.df, chisq.prob, fit.0, fit.chi, singles)
+rm(chi.df, chisq.prob, fit.0, fit.chi, singles)
+
+# Adding language to mixed -- mixed still isn't significant
+dec_lang <- author_decisions %>% filter(author_order == 1) %>% select(ms_id, language)
+dec_lang$english <- ifelse(dec_lang$language == "English", TRUE, FALSE)
+dec_lang$english <- factor(dec_lang$english, ordered = FALSE)
+dec_lang$english  <- relevel(dec_lang$english, ref = "FALSE")
+
+dec_lang_2 <- inner_join(mixed.combined, dec_lang, by = "ms_id")
+
+fit.1 <- glm(paper_rejected ~ mixed + english,
+             data = dec_lang_2, family = "binomial")
+summary(fit.1)
+round(exp(cbind(OR = coef(fit.1), confint(fit.1))), 3)
+
+rm(dec_lang, dec_lang_2, mixed.combined, fit.1)
