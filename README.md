@@ -100,14 +100,18 @@ not listed, then an alternate site is used.
 
 Notes and alternate sites for the following countries are listed below:
 
-- Cameroon people speak over two dozen African langauges (no dominant language),
-but English is listed as one of the official languages, so English is listed as 
-the language for Cameroon. - Ghana lists English as an official language. 
-English is used. - India: English - Namibia: English - Norway lists two versions
-of Norwegian: Bokmal Norwegian (official) and Nynorsk Norwegian (official). I 
-reduced to Norwegian. - Rwanda: English. - Sri Lanka: English has special status
-in the constitution. English is used. - French Guiana: French from Wikipedia 
-(5/31/2016) - Martinique: French from Wikipedia (5/31/2016)
+- Cameroon people speak over two dozen African langauges (no dominant 
+  language), but English is listed as one of the official languages, so English 
+  is listed as the language for Cameroon.
+- Ghana lists English as an official language. English is used.
+- India: English
+- Namibia: English
+- Norway lists two versions of Norwegian: Bokmal Norwegian (official) and 
+  Nynorsk Norwegian (official). I reduced to Norwegian.
+- Rwanda: English.
+- Sri Lanka: English has special status in the constitution. English is used.
+- French Guiana: French from Wikipedia (5/31/2016)
+- Martinique: French from Wikipedia (5/31/2016)
 
 Source: 
 https://www.cia.gov/library/publications/the-world-factbook/fields/2098.html, 
@@ -115,12 +119,17 @@ accessed on May 31, 2016
 
 **Human Development index scores**
 
+Collected in order to evaluate against socioeconomic information
+
 - Caymen Islands is not listed, since it is a British Territory, we use the 
-United Kingdom index. - Martinique is a territory of France, so we use the 
-France index. - Monaco is an independent country, but does not have a HDI, so we
-use France, its closest neighbor. - New Caledonia is a part of France, so we use
-the France Index. - Puerto Rico is part of the US, so we use the US index. - 
-Svalbard and Jan Mayan is part of Norway, so we use the Norway index. - Taiwan 
-is counted as China. - French Guiana uses the France index.
+  United Kingdom index.
+- Martinique is a territory of France, so we use the France index.
+- Monaco is an independent country, but does not have a HDI, so we use France, 
+  its closest neighbor.
+- New Caledonia is a part of France, so we use the France Index.
+- Puerto Rico is part of the US, so we use the US index.
+- Svalbard and Jan Mayan is part of Norway, so we use the Norway index.
+- Taiwan is counted as China.
+- French Guiana uses the France index.
 
 Source: http://hdr.undp.org/en/countries, accessed on May 27, 2016
