@@ -11,8 +11,10 @@ The data may be uploaded here at a future time.
 
 ## Data files: decisions.csv and decisions_2.csv
 
-- decisons.csv is the source file.
-- decisions_2.csv is a copy of the above but variable names were lightly edited in LibreOffice Calc and . notation was replaced with NA (to make R file friendly)
+- decisons.csv is the source file
+- decisions_2.csv is a copy of the above but variable names were lightly edited 
+  in LibreOffice Calc and . notation was replaced with NA (to make R file 
+  friendly)
 
 Variable definitions for decisions.csv and decisions_2.csv:
 
@@ -58,7 +60,7 @@ time_to_decision: | time in days to decision on manuscript
 
 ## Data file: author_decisions.csv
 
-Whereas the data in decisions*.csv groups variables by manuscript, 
+Whereas the data in decisions.csv groups variables by manuscript, 
 author_decisions.csv unpacks manuscript data and contains extra observations 
 about authors per manuscript.
 
