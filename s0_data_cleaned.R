@@ -144,3 +144,20 @@ dec <- auth_tmp
 
 rm(auth_tmp, mixed.true, mixed.false, mixed.false.logic, mixed.combined)
 
+# Geocoding author countries
+dec_review <- author_decisions
+
+# Replace Georgia with Tbilisi ; otherwise Google geocodes for US State
+dec_review$author_country <- gsub("Georgia", "Tbilisi",
+                                  dec_review$author_country)
+
+## Geocode author countries
+author_country_id <- unique(dec_review$author_country)
+country_id        <- geocode(author_country_id,
+                             output = "latlon",
+                             source = "google")
+country_id$author_country <- author_country_id
+write.table(country_id, file="country_id.csv",
+            quote=TRUE, sep=",",
+            row.names=FALSE)
+rm(author_country_id)
