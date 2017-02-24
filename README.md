@@ -113,11 +113,6 @@ Source:
 https://www.cia.gov/library/publications/the-world-factbook/fields/2098.html, 
 accessed on May 31, 2016
 
-## I gathered this data because I thought it might help elucidate any
-## geographical findings, but given the distribution of scores (very negatively
-## skewed), it's been difficult to make sense of it. Not sure yet, then, if we'll
-## use it.
-
 **Human Development index scores**
 
 - Caymen Islands is not listed, since it is a British Territory, we use the 
