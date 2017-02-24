@@ -62,7 +62,10 @@ rm(fit.0, fit.chi, chi.df, chisq.prob, dec_sent)
 
 dec_handling_editors <- dec %>% filter(sent_for_review == "Yes") %>%
         select(ms_id, paper_rejected)
-dec_author_country   <- author_decisions %>% select(ms_id, author_country)
+# dec_author_country   <- author_decisions %>% select(ms_id, author_country)
+dec_author_country   <- author_decisions %>% select(ms_id, geographic_region)
+# dec_author_country   <- author_decisions %>% filter(author_order == 1) %>%
+#         select(ms_id, geographic_region)
 dec_mixed_countries  <- inner_join(dec_handling_editors,
                                    dec_author_country,
                                    by = "ms_id")
@@ -125,18 +128,3 @@ chisq.prob <- 1 - pchisq(fit.chi, chi.df)
 fit.chi; chi.df; chisq.prob
 
 rm(chi.df, chisq.prob, fit.0, fit.chi, singles)
-
-# Adding language to mixed -- mixed still isn't significant
-dec_lang <- author_decisions %>% filter(author_order == 1) %>% select(ms_id, language)
-dec_lang$english <- ifelse(dec_lang$language == "English", TRUE, FALSE)
-dec_lang$english <- factor(dec_lang$english, ordered = FALSE)
-dec_lang$english  <- relevel(dec_lang$english, ref = "FALSE")
-
-dec_lang_2 <- inner_join(mixed.combined, dec_lang, by = "ms_id")
-
-fit.1 <- glm(paper_rejected ~ mixed + english,
-             data = dec_lang_2, family = "binomial")
-summary(fit.1)
-round(exp(cbind(OR = coef(fit.1), confint(fit.1))), 3)
-
-rm(dec_lang, dec_lang_2, mixed.combined, fit.1)
