@@ -11,9 +11,8 @@ The data may be uploaded here at a future time.
 
 ## Data files: decisions.csv and decisions_2.csv
 
-- decisons.csv is the source file. - decisions_2.csv is a copy of the above but 
-has been lightly edited in LibreOffice Calc (variable names have been changed to
-make them friendly in an R environment).
+- decisons.csv is the source file.
+- decisions_2.csv is a copy of the above but variable names were lightly edited in LibreOffice Calc and . notation was replaced with NA (to make R file friendly)
 
 Variable definitions for decisions.csv and decisions_2.csv:
 
