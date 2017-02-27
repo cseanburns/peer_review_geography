@@ -21,23 +21,6 @@ contrasts(dec0$english)
 fit.0 <- glm(sent_for_review ~ first_auth_geog,
              data = dec0, family = "binomial")
 
-# ROC Curve and Parameters
-prob=predict(fit.0,type=c("response"))
-dec0$prob=prob
-g <- roc(sent_for_review ~ prob, data = dec0)
-plot(g)
-g
-
-# Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
-# in other functions
-roc_curve <- function(model, dataset) {
-        prob <- predict(model, type = c("response"))
-        dataset$prob <- prob
-        g <- roc(sent_for_review ~ prob, data = dataset)
-        pg <- plot(g)
-        return(list(plot(pg)))
-}
-
 fit.1 <- glm(sent_for_review ~ first_auth_geog + english,
              data = dec0, family = "binomial")
 
@@ -66,6 +49,16 @@ round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
 round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)
 round(exp(cbind(OR = coef(fit.4), confint(fit.4))), 3)
 round(exp(cbind(OR = coef(fit.5), confint(fit.5))), 3)
+
+# Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
+# in other functions
+roc_curve <- function(model, dataset) {
+        prob <- predict(model, type = c("response"))
+        dataset$prob <- prob
+        g <- roc(sent_for_review ~ prob, data = dataset)
+        pg <- plot(g)
+        return(list(plot(pg)))
+}
 
 # Test the overall effect of the levels
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 1)
