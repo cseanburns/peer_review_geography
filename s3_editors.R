@@ -13,12 +13,13 @@ sort(round(table(dec_sent$handling_editor_geog) /
      decreasing = TRUE)
 
 # Get percentage of author geographies to handling editor geographies
-table(dec_sent$first_auth_geog) ; table(dec_sent$handling_editor_geog)
-round(table(dec_sent$first_auth_geog) / table(dec_sent$handling_editor_geog),2)
-round(table(dec_sent$handling_editor_geog) / table(dec_sent$first_auth_geog),2)
-author.editor.tbl <- table(dec_sent$first_auth_geog, dec_sent$handling_editor_geog)
-assocstats(author.editor.tbl)
-rm(author.editor.tbl)
+p <- table(dec_sent$first_auth_geog) / sum(table(dec_sent$first_auth_geog))
+q <- table(dec_sent$handling_editor_geog)
+round(p, 4) ; round(q, 4) ; round(q / sum(q), 4)
+round(p / (q / sum(q)), 4)
+chisq.test(q, p = p)
+round(cbind(p, (q / sum(q))), 3)
+round(p / (q / sum(q)), 3)
 
 dec_sent$paper_rejected       <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$handling_editor_geog <- relevel(dec_sent$handling_editor_geog,
@@ -45,6 +46,15 @@ chisq.prob  <- 1 - pchisq(fit.chi, chi.df)
 # Display the results
 fit.chi ; chi.df ; chisq.prob
 
+# ROC Curve
+roc_curve <- function(model, dataset) {
+        prob <- predict(model, type = c("response"))
+        dataset$prob <- prob
+        g <- roc(paper_rejected ~ prob, data = dataset)
+        pg <- plot(g)
+        return(list(plot(pg)))
+}
+
 # dec_tmp <- select(dec_sent, handling_editor_geog, paper_rejected)
 # table(dec_tmp)
 # 
@@ -63,4 +73,4 @@ fit.chi ; chi.df ; chisq.prob
 #                                     colour = "black")) +
 #         theme(legend.position = c(.8,.8))
 
-rm(fit.0, fit.chi, chi.df, chisq.prob)
+rm(dec_sent, dec0, dec_sent, fit.0, fit.chi, chi.df, chisq.prob)
