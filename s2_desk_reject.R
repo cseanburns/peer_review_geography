@@ -21,6 +21,23 @@ contrasts(dec0$english)
 fit.0 <- glm(sent_for_review ~ first_auth_geog,
              data = dec0, family = "binomial")
 
+# ROC Curve and Parameters
+prob=predict(fit.0,type=c("response"))
+dec0$prob=prob
+g <- roc(sent_for_review ~ prob, data = dec0)
+plot(g)
+g
+
+# Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
+# in other functions
+roc_curve <- function(model, dataset) {
+        prob <- predict(model, type = c("response"))
+        dataset$prob <- prob
+        g <- roc(sent_for_review ~ prob, data = dataset)
+        pg <- plot(g)
+        return(list(plot(pg)))
+}
+
 fit.1 <- glm(sent_for_review ~ first_auth_geog + english,
              data = dec0, family = "binomial")
 
