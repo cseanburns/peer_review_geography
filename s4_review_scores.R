@@ -1,7 +1,7 @@
 # Scores
 # Focus on data set filtered by sent for review
 
-# source("libraries.R")
+# Restart R to avoid package conflicts
 require("ggplot2")
 require("MASS")
 require("Hmisc")
@@ -45,7 +45,6 @@ summary(m, digits = 3)
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
 (ci <- confint(m))
-# exp(coef(m))
 round(exp(cbind(OR = coef(m), ci)), 3)
 sf <- function(y) {
         c('Y>=1' = qlogis(mean(y >= 1)),
