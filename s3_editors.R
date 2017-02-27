@@ -13,6 +13,8 @@ sort(round(table(dec_sent$handling_editor_geog) /
      decreasing = TRUE)
 
 # Get percentage of author geographies to handling editor geographies
+# Test chisq distribution of handling editors against composition of first author
+# geographies
 p <- table(dec_sent$first_auth_geog) / sum(table(dec_sent$first_auth_geog))
 q <- table(dec_sent$handling_editor_geog)
 round(p, 4) ; round(q, 4) ; round(q / sum(q), 4)
