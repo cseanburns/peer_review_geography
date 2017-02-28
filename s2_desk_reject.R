@@ -4,51 +4,22 @@ source("libraries.R")
 dec0 <- dec
 
 # Sent for Review ; looking at desk rejects in this section
-dec0                 <- select(dec0, sent_for_review, first_auth_geog, english, HDI)
-dec0$HDI_10          <- dec0$HDI * 10
+dec0                 <- select(dec0, sent_for_review, first_auth_geog)
 dec0                 <- dec0[complete.cases(dec0),]
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
 dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
-dec0$english         <- factor(dec0$english)
-dec0$english         <- relevel(dec0$english, ref = "TRUE")
 
 summary(dec0)
 
 contrasts(dec0$sent_for_review)
 contrasts(dec0$first_auth_geog)
-contrasts(dec0$english)
 
 fit.0 <- glm(sent_for_review ~ first_auth_geog,
              data = dec0, family = "binomial")
 
-fit.1 <- glm(sent_for_review ~ first_auth_geog + english,
-             data = dec0, family = "binomial")
-
-fit.2 <- glm(sent_for_review ~ first_auth_geog + english + HDI_10,
-             data = dec0, family = "binomial")
-
-fit.3 <- glm(sent_for_review ~ english + HDI_10,
-             data = dec0, family = "binomial")
-
-fit.4 <- glm(sent_for_review ~ HDI_10,
-             data = dec0, family = "binomial")
-
-fit.5 <- glm(sent_for_review ~ english,
-             data = dec0, family = "binomial")
-
 summary(fit.0)
-summary(fit.1)
-summary(fit.2)
-summary(fit.3)
-summary(fit.4)
-summary(fit.5)
 
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
-round(exp(cbind(OR = coef(fit.1), confint(fit.1))), 3)
-round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
-round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)
-round(exp(cbind(OR = coef(fit.4), confint(fit.4))), 3)
-round(exp(cbind(OR = coef(fit.5), confint(fit.5))), 3)
 
 # Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
 # in other functions
@@ -98,5 +69,4 @@ ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
                                     colour = "black")) +
         theme(legend.position = c(.8,.8))
 
-rm(dec0, fit.0, fit.1, fit.2, fit.3, fit.4, fit.5,
-   fit.chi, chi.df, chisq.prob)
+rm(dec0, fit.0, fit.chi, chi.df, chisq.prob, roc_curve)
