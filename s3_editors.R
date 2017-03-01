@@ -8,6 +8,7 @@ dec0 <- dec0[complete.cases(dec0),]
 dec0 <- filter(dec0, handling_editor_geog != "Latin America")
 
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
+dec0$handling_editor_geog <- factor(dec0$handling_editor_geog)
 dec0$handling_editor_geog <- relevel(dec0$handling_editor_geog,
                                      ref = "Europe")
 
@@ -17,6 +18,8 @@ contrasts(dec0$handling_editor_geog)
 fit.0 <- glm(sent_for_review ~ handling_editor_geog, data = dec0, family = "binomial")
 summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
+
+table(dec0$sent_for_review, dec0$handling_editor_geog)
 
 # Test the overall effect of the levels
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 1)
