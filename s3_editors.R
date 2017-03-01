@@ -1,5 +1,56 @@
 source("libraries.R")
 
+# Editors by geographic regions, comparing to sent for review
+
+dec0 <- dec
+dec0 <- select(dec0, sent_for_review, handling_editor_geog)
+dec0 <- dec0[complete.cases(dec0),]
+dec0 <- filter(dec0, handling_editor_geog != "Latin America")
+
+dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
+dec0$handling_editor_geog <- relevel(dec0$handling_editor_geog,
+                                     ref = "Europe")
+
+contrasts(dec0$sent_for_review)
+contrasts(dec0$handling_editor_geog)
+
+fit.0 <- glm(sent_for_review ~ handling_editor_geog, data = dec0, family = "binomial")
+summary(fit.0)
+round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
+
+# Test the overall effect of the levels
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 1)
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2)
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 3)
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 4)
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 5)
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 6)
+wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:6)
+
+# The reduction in the deviance; results in the chi square statistic
+fit.chi     <- fit.0$null.deviance - fit.0$deviance
+# The degrees of freedom for the chi square statistic
+chi.df      <- fit.0$df.null - fit.0$df.residual
+# The probability associated with the chi-square statisitc
+# If (e.g.) less than 0.05, then we can reject the null hypothesis that the model
+# is not better than chance at predicting the outcome
+chisq.prob  <- 1 - pchisq(fit.chi, chi.df) 
+# Display the results
+fit.chi ; chi.df ; chisq.prob
+
+# ROC Curve
+roc_curve <- function(model, dataset) {
+        prob <- predict(model, type = c("response"))
+        dataset$prob <- prob
+        g <- roc(sent_for_review~ prob, data = dataset)
+        pg <- plot(g)
+        return(list(plot(pg)))
+}
+
+roc_curve(fit.0, dec0)
+
+rm(dec0, chi.df, chisq.prob, fit.chi, fit.0, roc_curve)
+
 # Editors by geographic regions, comparing to paper rejections 
 # Focus on sent for review data and not all data
 
