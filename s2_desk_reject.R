@@ -31,6 +31,8 @@ roc_curve <- function(model, dataset) {
         return(list(plot(pg)))
 }
 
+roc_curve(fit.0, dec0)
+
 # Test the overall effect of the levels
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 1)
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2)
