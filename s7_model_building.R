@@ -20,8 +20,8 @@ dec0 <- dec
 
 # Sent for Review ; looking at desk rejects in this section
 dec0                 <- select(dec0, sent_for_review, first_auth_geog, english, HDI)
-dec0$HDI_10          <- dec0$HDI * 10
 dec0                 <- dec0[complete.cases(dec0),]
+dec0$HDI_10          <- dec0$HDI * 10
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
 dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
 dec0$english         <- factor(dec0$english)
@@ -33,10 +33,14 @@ contrasts(dec0$sent_for_review)
 contrasts(dec0$first_auth_geog)
 contrasts(dec0$english)
 
-fit.1 <- glm(sent_for_review ~ first_auth_geog, data = dec0, family = "binomial")
-fit.2 <- glm(sent_for_review ~ first_auth_geog + english, data = dec0, family = "binomial")
-fit.3 <- glm(sent_for_review ~ first_auth_geog + HDI_10, data = dec0, family = "binomial")
-fit.4 <- glm(sent_for_review ~ first_auth_geog + english + HDI_10, data = dec0, family = "binomial")
+fit.1 <- glm(sent_for_review ~ first_auth_geog,
+             data = dec0, family = "binomial")
+fit.2 <- glm(sent_for_review ~ first_auth_geog + english,
+             data = dec0, family = "binomial")
+fit.3 <- glm(sent_for_review ~ first_auth_geog + HDI_10,
+             data = dec0, family = "binomial")
+fit.4 <- glm(sent_for_review ~ first_auth_geog + english + HDI_10,
+             data = dec0, family = "binomial")
 
 summary(fit.1)
 summary(fit.2)
