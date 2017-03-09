@@ -109,3 +109,23 @@ ggplot(t.sdf, aes(x = OR, y = Region)) +
         theme(legend.position = c(0.95,0.85))
 
 rm(ci, ctable, n.sdf, s.df, t.sdf, Level, m, p, s, s.tbl, sf)
+
+# regular glm
+
+dec_sent <- dplyr::filter(dec, sent_for_review == "Yes")
+dec_sent <- dplyr::select(dec_sent, mean_review_score, first_auth_geog, HDI, english)
+
+dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
+dec_sent$english <- factor(dec_sent$english)
+dec_sent$english <- relevel(dec_sent$english, ref = "TRUE")
+dec_sent$HDI10   <- dec_sent$HDI * 10
+dec_sent <- dec_sent[complete.cases(dec_sent),]
+
+contrasts(dec_sent$first_auth_geog)
+contrasts(dec_sent$english)
+
+fit.0 <- glm(mean_review_score ~ first_auth_geog + HDI10 + english, data = dec_sent)
+fit.1 <- glm(mean_review_score ~ first_auth_geog + HDI10, data = dec_sent)
+fit.2 <- glm(mean_review_score ~ first_auth_geog + english, data = dec_sent)
+fit.3 <- glm(mean_review_score ~ HDI10, data = dec_sent)
+fit.4 <- glm(mean_review_score ~ english, data = dec_sent)
