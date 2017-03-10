@@ -274,12 +274,12 @@ round(exp(cbind(OR = coef(fit.7), confint(fit.7))), 3)
 round(exp(cbind(OR = coef(fit.8), confint(fit.8))), 3)
 
 # Test the overall effect of the levels
-wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
+wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 2:7)
 
 # The reduction in the deviance; results in the chi square statistic
-fit.chi     <- fit.0$null.deviance - fit.0$deviance
+fit.chi     <- fit.1$null.deviance - fit.1$deviance
 # The degrees of freedom for the chi square statistic
-chi.df      <- fit.0$df.null - fit.0$df.residual
+chi.df      <- fit.1$df.null - fit.1$df.residual
 # The probability associated with the chi-square statistic
 # If (e.g.) less than 0.05, we can reject the null hypothesis that the model
 # is not better than chance at predicting the outcome
