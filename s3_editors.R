@@ -66,11 +66,24 @@ sort(round(table(dec_sent$handling_editor_geog) /
                    sum(table(dec_sent$handling_editor_geog)),3),
      decreasing = TRUE)
 
-# Get percentage of author geographies to handling editor geographies
+# Get percentage of author geographies to handling editor geographies for
+# papers that were sent for review
 # Test chisq distribution of handling editors against composition of first author
 # geographies
 p <- table(dec_sent$first_auth_geog) / sum(table(dec_sent$first_auth_geog))
 q <- table(dec_sent$handling_editor_geog)
+round(p, 4) ; round(q, 4) ; round(q / sum(q), 4)
+round(p / (q / sum(q)), 4)
+chisq.test(q, p = p)
+round(cbind(p, (q / sum(q))), 3)
+round(p / (q / sum(q)), 3)
+
+# Get percentage of author geographies to handling editor geographies for
+# all submitted papers
+# Test chisq distribution of handling editors against composition of first author
+# geographies
+p <- table(dec$first_auth_geog) / sum(table(dec$first_auth_geog))
+q <- table(dec$handling_editor_geog)
 round(p, 4) ; round(q, 4) ; round(q / sum(q), 4)
 round(p / (q / sum(q)), 4)
 chisq.test(q, p = p)
