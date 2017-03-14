@@ -66,6 +66,12 @@ sort(round(table(dec_sent$handling_editor_geog) /
                    sum(table(dec_sent$handling_editor_geog)),3),
      decreasing = TRUE)
 
+# Get percentage of first authors by region
+sort(table(dec_sent$first_auth_geog), decreasing = TRUE)
+sort(round(table(dec_sent$first_auth_geog) /
+                   sum(table(dec_sent$first_auth_geog)),3),
+     decreasing = TRUE)
+
 # Get percentage of author geographies to handling editor geographies for
 # papers that were sent for review
 # Test chisq distribution of handling editors against composition of first author
