@@ -2,6 +2,7 @@
 # Focus on data set filtered by sent for review
 
 # Restart R to avoid package conflicts
+require("car")
 require("ggplot2")
 require("MASS")
 require("Hmisc")
@@ -9,8 +10,6 @@ require("plyr")
 require("dplyr")
 
 dec_sent <- dplyr::filter(dec, sent_for_review == "Yes")
-dec_sent <- dplyr::select(dec_sent, mean_review_score, first_auth_geog)
-
 dec_sent <- dplyr::select(dec_sent, mean_review_score, first_auth_geog, english)
 
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
@@ -45,6 +44,7 @@ p + geom_boxplot() + geom_jitter(size = 0.75)
 
 m <- polr(mean.rs ~ first_auth_geog, data = dec_sent, Hess = TRUE)
 summary(m, digits = 3)
+Anova(m)
 (ctable <- coef(summary(m)))
 p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
 (ctable <- cbind(ctable, "p value" = p))
