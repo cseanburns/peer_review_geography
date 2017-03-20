@@ -1,7 +1,7 @@
 source("libraries.R")
 
 dec_sent                 <- filter(dec, sent_for_review == "Yes")
-dec_sent                 <- select(dec_sent, ms_id, paper_rejected, first_auth_geog)
+dec_sent                 <- select(dec_sent, ms_id, paper_rejected, first_auth_geog, submit_year)
 dec_sent                 <- dec_sent[complete.cases(dec_sent),]
 dec_sent$paper_rejected  <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
@@ -65,5 +65,15 @@ fit.chi ; chi.df ; chisq.prob
 #         theme(axis.text.x = element_text(size = 12,
 #                                          colour = "black")) +
 #         theme(legend.position = c(.8,.8))
+
+# Plotting least squares means by submit year
+fit.1 <- glm(paper_rejected ~ first_auth_geog + submit_year,
+             data = dec_sent, family = "binomial")
+
+fit.1.ls <- lsmeans(fit.1, "first_auth_geog", by = "submit_year")
+plot(fit.1.ls, xlab = "Least-Squares Means", ylab = "First Author Geography",
+     main = "For Papers Not Accepted or Invited to Revise")
+
+rm(dec0, fit.0, fit.chi, chi.df, chisq.prob, roc_curve, fit.1.ls, fit.1)
 
 rm(fit.0, fit.chi, chi.df, chisq.prob, dec_sent, roc_curve)
