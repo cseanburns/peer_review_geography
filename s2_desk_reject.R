@@ -4,7 +4,7 @@ source("libraries.R")
 dec0 <- dec
 
 # Sent for Review ; looking at desk rejects in this section
-dec0                 <- select(dec0, sent_for_review, first_auth_geog)
+dec0                 <- select(dec0, sent_for_review, first_auth_geog, submit_year)
 dec0                 <- dec0[complete.cases(dec0),]
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
 dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
@@ -20,6 +20,7 @@ fit.0 <- glm(sent_for_review ~ first_auth_geog,
 summary(fit.0)
 
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
+
 
 # Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
 # in other functions
@@ -71,4 +72,14 @@ ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
                                     colour = "black")) +
         theme(legend.position = c(.8,.8))
 
+
+# Plotting least squares means by submit year
+fit.1 <- glm(sent_for_review ~ first_auth_geog + submit_year,
+             data = dec0, family = "binomial")
+
+fit.1.ls <- lsmeans(fit.1, "first_auth_geog", by = "submit_year")
+plot(fit.1.ls, xlab = "Least-Squares Means", ylab = "First Author Geography",
+     main = "For Papers Sent for Review")
+
 rm(dec0, fit.0, fit.chi, chi.df, chisq.prob, roc_curve)
+rm(fit.1, fit.1.ls)
