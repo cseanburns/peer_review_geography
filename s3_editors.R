@@ -3,7 +3,7 @@ source("libraries.R")
 # Editors by geographic regions, comparing to sent for review
 
 dec0 <- dec
-dec0 <- select(dec0, sent_for_review, handling_editor_geog)
+dec0 <- select(dec0, sent_for_review, handling_editor_geog, handling_editor)
 dec0 <- dec0[complete.cases(dec0),]
 dec0 <- filter(dec0, handling_editor_geog != "Latin America")
 
@@ -18,8 +18,23 @@ contrasts(dec0$handling_editor_geog)
 fit.0 <- glm(sent_for_review ~ handling_editor_geog, data = dec0, family = "binomial")
 summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
-
 table(dec0$sent_for_review, dec0$handling_editor_geog)
+
+# Add handling_editor ID as a random effect
+# Code derived from: http://stats.idre.ucla.edu/r/dae/mixed-effects-logistic-regression/
+fit.1 <- glmer(sent_for_review ~ handling_editor_geog + (1 | handling_editor),
+             data = dec0, family = "binomial", control = glmerControl(optimizer = "bobyqa"),
+             nAGQ = 10)
+
+summary(fit.1)
+print(fit.1, corr = FALSE)
+
+se <- sqrt(diag(vcov(fit.1)))
+# table of estimates with 95% CI
+(tab <- cbind(Est = fixef(fit.1), LL = fixef(fit.1) - 1.96 * se, UL = fixef(fit.1) + 1.96 *
+                      se))
+exp(tab)
+Anova(fit.1)
 
 # Test the overall effect of the levels
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 1)
@@ -52,7 +67,7 @@ roc_curve <- function(model, dataset) {
 
 roc_curve(fit.0, dec0)
 
-rm(dec0, chi.df, chisq.prob, fit.chi, fit.0, roc_curve)
+rm(fit.0, fit.1, dec0, fit.chi, chi.df, chisq.prob, roc_curve, tab, se)
 
 # Editors by geographic regions, comparing to paper rejections 
 # Focus on sent for review data and not all data
@@ -107,6 +122,22 @@ fit.0 <- glm(paper_rejected ~ handling_editor_geog, data = dec_sent, family = "b
 summary(fit.0)
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
+# Add handling_editor ID as a random effect
+fit.1 <- glmer(paper_rejected ~ handling_editor_geog + (1 | handling_editor),
+             data = dec_sent, family = "binomial",
+             control = glmerControl(optimizer = "bobyqa"),
+             nAGQ = 10)
+
+summary(fit.1)
+print(fit.1, corr = FALSE)
+
+se <- sqrt(diag(vcov(fit.1)))
+# table of estimates with 95% CI
+(tab <- cbind(Est = fixef(fit.1), LL = fixef(fit.1) - 1.96 * se, UL = fixef(fit.1) + 1.96 *
+                      se))
+exp(tab)
+Anova(fit.1)
+
 # Test the overall effect of the levels
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
 
@@ -149,3 +180,4 @@ roc_curve <- function(model, dataset) {
 #         theme(legend.position = c(.8,.8))
 
 rm(dec_sent, dec0, dec_sent, fit.0, fit.chi, chi.df, chisq.prob)
+rm(tab, fit.1, p, q, se)
