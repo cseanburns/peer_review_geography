@@ -34,7 +34,7 @@ assocstats(tbl.2b)
 rowSums(tbl.2b)
 rm(tbl.2a, tbl.2b)
 
-# Geographical difference between first and corresponding authors
+# Geographical difference between first and submitting authors
 tbl.3a <- round(table(dec0$submit_auth_first_auth) /
                         sum(table(dec0$submit_auth_first_auth)), 3)
 tbl.3a
@@ -44,6 +44,3 @@ tbl.3b
 assocstats(tbl.3b)
 rowSums(tbl.3b)
 rm(tbl.3a, tbl.3b)
-
-# The number of papers that include authors from more than one country or one country
-round(table(dec0$mixed) / sum(table(dec0$mixed)), 3)
