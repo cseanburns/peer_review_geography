@@ -28,7 +28,6 @@ table(first_second_tbl)/sum(table(first_second_tbl))
 rm(first_second, first_second_tbl, ms_single)
 
 # Find the percentage shared locations between first and third authors
-
 # this captures the first and third positions
 first_third <- select(author_decisions, ms_id, author_country, author_order)
 first_third <- arrange(first_third, ms_id, author_order)
