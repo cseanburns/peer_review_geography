@@ -44,34 +44,8 @@ wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 6)
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 7)
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
 
-# 1. The reduction in the deviance; results in the chi square statistic
-# 2. The degrees of freedom for the chi square statistic
-# 3. The probability associated with the chi-square statistic. If (e.g.) less
-# than 0.05, we can reject the null hypothesis that the model is not better
-# than chance at predicting the outcome
-# 4. Display the results
-fit.chi <- fit.0$null.deviance - fit.0$deviance
-chi.df  <- fit.0$df.null - fit.0$df.residual
-chisq.prob <- 1 - pchisq(fit.chi, chi.df)
-fit.chi; chi.df; chisq.prob
-
-reorder_size <- function(x) {
-        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
-}
-
-ggplot(dec0, aes(x = reorder_size(first_auth_geog), fill = sent_for_review)) +
-        geom_bar(aes(y = (..count..)/sum(..count..))) +
-        scale_y_continuous(labels = percent) + theme_bw() +
-        # geom_bar() + theme_bw() +
-        scale_fill_grey(name = "Sent for Review") +
-        labs(x = "Geographical Region of First Author",
-        y = "Count") +
-        theme(axis.text.y = element_text(size = 12,
-                                    colour = "black")) +
-        theme(axis.text.x = element_text(size = 12,
-                                    colour = "black")) +
-        theme(legend.position = c(.8,.8))
-
+# Model fit
+Anova(fit.0)
 
 # Plotting least squares means by submit year
 fit.1 <- glm(sent_for_review ~ first_auth_geog + submit_year,
