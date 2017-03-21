@@ -58,22 +58,17 @@ author_data <- select(author_data, ms_id, submit_year, author_order,
                       prop_reviewers_responding, prop_reviewers_agreeing,
                       sent_for_review, paper_rejected)
 
-author_data_max <- author_data %>%
+# change to min to get first author
+author_data_min <- author_data %>%
         group_by(ms_id) %>%
-        filter(author_order==max(author_order))
-
-author_data_max$author_count <- author_data_max$author_order
-author_data_max$author_order <- NULL
-
-# Remove all papers w/ single authors (we're looking at collaborations)
-author_data_max <- author_data_max %>% filter(author_count > 1)
+        filter(author_order==min(author_order))
 
 # Convert language to English logical value
-author_data_max$english <- author_data_max$language == "English"
+author_data_min$english <- author_data_min$language == "English"
 
-dec <- author_data_max
+dec <- author_data_min
 
-rm(author_data, author_data_max)
+rm(author_data, author_data_min)
 
 # convert to factors
 
