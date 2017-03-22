@@ -124,20 +124,6 @@ se <- sqrt(diag(vcov(fit.1)))
 exp(tab)
 Anova(fit.1)
 
-# Test the overall effect of the levels
-wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
-
-# The reduction in the deviance; results in the chi square statistic
-fit.chi     <- fit.0$null.deviance - fit.0$deviance
-# The degrees of freedom for the chi square statistic
-chi.df      <- fit.0$df.null - fit.0$df.residual
-# The probability associated with the chi-square statisitc
-# If (e.g.) less than 0.05, then we can reject the null hypothesis that the model
-# is not better than chance at predicting the outcome
-chisq.prob  <- 1 - pchisq(fit.chi, chi.df) 
-# Display the results
-fit.chi ; chi.df ; chisq.prob
-
 # ROC Curve
 roc_curve <- function(model, dataset) {
         prob <- predict(model, type = c("response"))
@@ -147,5 +133,5 @@ roc_curve <- function(model, dataset) {
         return(list(plot(pg)))
 }
 
-rm(dec_sent, dec0, dec_sent, fit.0, fit.chi, chi.df, chisq.prob)
+rm(dec_sent, dec0, dec_sent, fit.0)
 rm(tab, fit.1, p, q, se)
