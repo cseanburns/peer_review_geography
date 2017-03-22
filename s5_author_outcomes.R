@@ -25,8 +25,8 @@ roc_curve <- function(model, dataset) {
 }
 
 roc_curve(fit.0, dec_sent)
-
 summary(fit.0)
+Anova(fit.0)
 
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
@@ -39,17 +39,6 @@ wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 5)
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 6)
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 7)
 wald.test(b = coef(fit.0), Sigma = vcov(fit.0), Terms = 2:7)
-
-# The reduction in the deviance; results in the chi square statistic
-fit.chi     <- fit.0$null.deviance - fit.0$deviance
-# The degrees of freedom for the chi square statistic
-chi.df      <- fit.0$df.null - fit.0$df.residual
-# The probability associated with the chi-square statistic
-# If (e.g.) less than 0.05, we can reject the null hypothesis that the model
-# is not better than chance at predicting the outcome
-chisq.prob  <- 1 - pchisq(fit.chi, chi.df) 
-# display the results
-fit.chi ; chi.df ; chisq.prob
 
 # reorder_size <- function(x) {
 #         factor(x, levels = names(sort(table(x), decreasing = TRUE)))
