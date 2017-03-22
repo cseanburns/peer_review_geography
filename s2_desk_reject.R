@@ -1,11 +1,9 @@
 source("libraries.R")
 
-# create working copy
-dec0 <- dec
-
 # Sent for Review ; looking at desk rejects in this section
-dec0                 <- select(dec0, sent_for_review, first_auth_geog, submit_year)
-dec0                 <- dec0[complete.cases(dec0),]
+dec0 <- dec %>% select(first_auth_geog, sent_for_review, submit_year)
+dec0 <- dec0[complete.cases(dec0),]
+
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
 dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
 
