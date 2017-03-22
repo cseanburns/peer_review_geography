@@ -10,7 +10,7 @@ require("plyr")
 require("dplyr")
 
 dec_sent <- dplyr::filter(dec, sent_for_review == "Yes")
-dec_sent <- dplyr::select(dec_sent, mean_review_score, first_auth_geog, english)
+dec_sent <- dplyr::select(dec_sent, mean_review_score, first_auth_geog)
 
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
 # remove rows with NAs
@@ -36,8 +36,6 @@ contrasts(dec_sent$mean.rs)
 # help from UCLA site: http://www.ats.ucla.edu/stat/r/dae/ologit.htm
 
 ftable(xtabs(~ mean.rs + first_auth_geog, data = dec_sent))
-ftable(xtabs(~ mean.rs + english, data = dec_sent))
-plot(dec_sent$mean.rs ~ as.factor(dec_sent$english))
 
 p <- ggplot(dec_sent, aes(x = first_auth_geog, y = mean_review_score))
 p + geom_boxplot() + geom_jitter(size = 0.75)
