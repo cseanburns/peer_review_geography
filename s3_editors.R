@@ -55,7 +55,7 @@ roc_curve <- function(model, dataset) {
 
 roc_curve(fit.0, dec0)
 
-rm(fit.0, fit.1, dec0, fit.chi, chi.df, chisq.prob, roc_curve, tab, se)
+rm(fit.0, fit.1, dec0, roc_curve, tab, se)
 
 # Editors by geographic regions, comparing to paper rejections 
 # Focus on sent for review data and not all data
@@ -133,5 +133,5 @@ roc_curve <- function(model, dataset) {
         return(list(plot(pg)))
 }
 
-rm(dec_sent, dec0, dec_sent, fit.0)
+rm(dec_sent, fit.0)
 rm(tab, fit.1, p, q, se)
