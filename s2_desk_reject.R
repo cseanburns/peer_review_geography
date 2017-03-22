@@ -19,6 +19,9 @@ summary(fit.0)
 
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
+fit.0.ls <- lsmeans(fit.0, "first_auth_geog")
+plot(fit.0.ls, xlab = "Least-Squares Means", ylab = "First Author Geography",
+     main = "For Papers Sent for Review")
 
 # Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
 # in other functions
@@ -53,5 +56,5 @@ fit.1.ls <- lsmeans(fit.1, "first_auth_geog", by = "submit_year")
 plot(fit.1.ls, xlab = "Least-Squares Means", ylab = "First Author Geography",
      main = "For Papers Sent for Review")
 
-rm(dec0, fit.0, fit.chi, chi.df, chisq.prob, roc_curve)
+rm(dec0, fit.0, fit.0.ls, roc_curve)
 rm(fit.1, fit.1.ls)
