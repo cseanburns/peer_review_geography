@@ -13,15 +13,10 @@ chi_compare <- function(model.1, model.2) {
            cat("times as probable as the first model, minimizing information loss.")
 }
 
-# Build models for desk reject
-
-# create working copy
-dec0 <- dec
-
 # Sent for Review ; looking at desk rejects in this section
-dec0                 <- select(dec0, sent_for_review, first_auth_geog, english, HDI)
+dec0                 <- select(dec, sent_for_review, first_auth_geog, english, HDI)
 dec0                 <- dec0[complete.cases(dec0),]
-dec0$HDI_10          <- dec0$HDI * 10
+dec0$HDI_100         <- dec0$HDI * 100
 dec0$sent_for_review <- relevel(dec0$sent_for_review, ref = "No")
 dec0$first_auth_geog <- relevel(dec0$first_auth_geog, ref = "Europe")
 dec0$english         <- factor(dec0$english)
@@ -52,6 +47,20 @@ round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
 round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)
 round(exp(cbind(OR = coef(fit.4), confint(fit.4))), 3)
 
+plot(HDI_100 ~ sent_for_review, data = dec0)
+plot(HDI_sd ~ sent_for_review, data = dec0)
+plot(HDI_100 ~ sent_for_review, data = dec0)
+
+function(x) {
+        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
+}
+
+p <- ggplot(dec0, aes(x = reorder_size(first_auth_geog), y = HDI_10, fill = sent_for_review))
+p + geom_boxplot()
+
+p <- ggplot(dec0, aes(x = first_auth_geog, y = HDI_10, fill = sent_for_review))
+p + geom_boxplot()
+
 # Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
 # in other functions
 roc_curve <- function(model, dataset) {
@@ -77,16 +86,11 @@ wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 6)
 wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 7)
 wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 2:7)
 
-# 1. The reduction in the deviance; results in the chi square statistic
-# 2. The degrees of freedom for the chi square statistic
-# 3. The probability associated with the chi-square statistic. If (e.g.) less
-# than 0.05, we can reject the null hypothesis that the model is not better
-# than chance at predicting the outcome
-# 4. Display the results
-fit.chi <- fit.1$null.deviance - fit.1$deviance
-chi.df  <- fit.1$df.null - fit.1$df.residual
-chisq.prob <- 1 - pchisq(fit.chi, chi.df)
-fit.chi; chi.df; chisq.prob
+# Test the model
+Anova(fit.1)
+Anova(fit.2)
+Anova(fit.3)
+Anova(fit.4)
 
 chi_compare(fit.1, fit.2)
 chi_compare(fit.1, fit.3)
@@ -94,18 +98,18 @@ chi_compare(fit.1, fit.4)
 chi_compare(fit.3, fit.4)
 
 # Test linearity of the logit
-dec0$log_hdi10 <- log(dec0$HDI_10) * dec0$HDI_10
-fit.5 <- glm(sent_for_review ~ first_auth_geog + HDI_10 + log_hdi10, data = dec0, family = "binomial")
-fit.6 <- glm(sent_for_review ~ first_auth_geog + english + HDI_10 + log_hdi10,
+dec0$log_hdi100 <- log(dec0$HDI_100) * dec0$HDI_100
+fit.5 <- glm(sent_for_review ~ first_auth_geog + HDI_100 + log_hdi100, data = dec0, family = "binomial")
+fit.6 <- glm(sent_for_review ~ first_auth_geog + english + HDI_100 + log_hdi100,
              data = dec0, family = "binomial")
 summary(fit.5)
 summary(fit.6)
 
 rm(dec0, fit.1, fit.2, fit.3, fit.4, fit.5, fit.6, roc_curve)
-rm(chi.df, chisq.prob, fit.chi)
 
+# RESTART R TO AVOID PACKAGE CONFLICTS
 # Build models for mean review score
-# Resetart R to avoid package conflicts
+require("car")
 require("ggplot2")
 require("MASS")
 require("Hmisc")
@@ -117,7 +121,7 @@ dec_score <- dplyr::filter(dec, sent_for_review == "Yes")
 dec_score <- dplyr::select(dec_score, mean_review_score,
                            first_auth_geog, english, HDI)
 
-dec_score$HDI10 <- dec_score$HDI * 10
+dec_score$HDI_100 <- dec_score$HDI * 100
 
 dec_score <- dec_score[complete.cases(dec_score),]
 
@@ -143,8 +147,8 @@ ftable(xtabs(~ mean.rs + first_auth_geog, data = dec_score))
 
 fit.1 <- polr(mean.rs ~ first_auth_geog, data = dec_score, Hess = TRUE)
 fit.2 <- polr(mean.rs ~ first_auth_geog + english, data = dec_score, Hess = TRUE)
-fit.3 <- polr(mean.rs ~ first_auth_geog + HDI10, data = dec_score, Hess = TRUE)
-fit.4 <- polr(mean.rs ~ first_auth_geog + english + HDI10, data = dec_score, Hess = TRUE)
+fit.3 <- polr(mean.rs ~ first_auth_geog + HDI_100, data = dec_score, Hess = TRUE)
+fit.4 <- polr(mean.rs ~ first_auth_geog + english + HDI_100, data = dec_score, Hess = TRUE)
 
 summary(fit.1, digits = 3)
 summary(fit.2, digits = 3)
@@ -181,6 +185,11 @@ round(exp(cbind(OR = coef(fit.2), ci2)), 3)
 round(exp(cbind(OR = coef(fit.3), ci3)), 3)
 round(exp(cbind(OR = coef(fit.4), ci4)), 3)
 
+Anova(fit.1)
+Anova(fit.2)
+Anova(fit.3)
+Anova(fit.4)
+
 chi_compare(fit.1, fit.2) # sig = yes
 chi_compare(fit.1, fit.3) # sig = no
 chi_compare(fit.1, fit.4) # sig = yes
@@ -192,13 +201,13 @@ rm(fit.1, fit.2, fit.3, fit.4)
 rm(p1, p2, p3, p4)
 rm(dec_score)
 
+# RESTART R AFTER MEAN REVIEW SCORE MODELING
 # Build models for paper reject
-# Restart R after mean review score modeling
 source('libraries.R')
 dec_sent                 <- filter(dec, sent_for_review == "Yes")
 dec_sent                 <- select(dec_sent, ms_id, paper_rejected,
                                    first_auth_geog, english, HDI, mean_review_score)
-dec_sent$HDI10           <- dec_sent$HDI * 10
+dec_sent$HDI_100           <- dec_sent$HDI * 100
 dec_sent                 <- dec_sent[complete.cases(dec_sent),]
 dec_sent$paper_rejected  <- relevel(dec_sent$paper_rejected, ref = "Yes")
 dec_sent$first_auth_geog <- relevel(dec_sent$first_auth_geog, ref = "Europe")
@@ -217,20 +226,20 @@ fit.1 <- glm(paper_rejected ~ first_auth_geog,
 
 fit.2 <- glm(paper_rejected ~ first_auth_geog + english,
              data = dec_sent, family = "binomial")
-fit.3 <- glm(paper_rejected ~ first_auth_geog + HDI10,
+fit.3 <- glm(paper_rejected ~ first_auth_geog + HDI_100,
              data = dec_sent, family = "binomial")
 fit.4 <- glm(paper_rejected ~ first_auth_geog + mean_review_score,
              data = dec_sent, family = "binomial")
 
-fit.5 <- glm(paper_rejected ~ first_auth_geog + english + HDI10,
+fit.5 <- glm(paper_rejected ~ first_auth_geog + english + HDI_100,
              data = dec_sent, family = "binomial")
 fit.6 <- glm(paper_rejected ~ first_auth_geog + english + mean_review_score,
              data = dec_sent, family = "binomial")
  
-fit.7 <- glm(paper_rejected ~ first_auth_geog + HDI10 + mean_review_score,
+fit.7 <- glm(paper_rejected ~ first_auth_geog + HDI_100 + mean_review_score,
              data = dec_sent, family = "binomial")
 
-fit.8 <- glm(paper_rejected ~ first_auth_geog + english + HDI10 + mean_review_score,
+fit.8 <- glm(paper_rejected ~ first_auth_geog + english + HDI_100 + mean_review_score,
              data = dec_sent, family = "binomial")
 
 # Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
@@ -287,6 +296,15 @@ chisq.prob  <- 1 - pchisq(fit.chi, chi.df)
 # display the results
 fit.chi ; chi.df ; chisq.prob
 
+Anova(fit.1)
+Anova(fit.2)
+Anova(fit.3)
+Anova(fit.4)
+Anova(fit.5)
+Anova(fit.6)
+Anova(fit.7)
+Anova(fit.8)
+
 chi_compare(fit.1, fit.2)
 chi_compare(fit.1, fit.3)
 chi_compare(fit.1, fit.4)
@@ -309,24 +327,25 @@ chi_compare(fit.7, fit.6)
 chi_compare(fit.7, fit.8)
 
 # linearity of the logit assumption test
-dec_sent$log_hdi10 <- log(dec_sent$HDI10) * dec_sent$HDI10
+dec_sent$log_hdi100 <- log(dec_sent$HDI_100) * dec_sent$HDI_100
 dec_sent$log_mrs <- log(dec_sent$mean_review_score) * dec_sent$mean_review_score
 
-fit.a <- glm(paper_rejected ~ first_auth_geog + HDI10 + log_hdi10,
+fit.a <- glm(paper_rejected ~ first_auth_geog + HDI_100 + log_hdi100,
              data = dec_sent, family = "binomial")
 
 fit.b <- glm(paper_rejected ~ first_auth_geog + mean_review_score + log_mrs,
              data = dec_sent, family = "binomial")
 
-fit.c <- glm(paper_rejected ~ first_auth_geog + english + HDI10 + log_hdi10,
+fit.c <- glm(paper_rejected ~ first_auth_geog + english + HDI_100 + log_hdi100,
              data = dec_sent, family = "binomial")
 fit.d <- glm(paper_rejected ~ first_auth_geog + english + mean_review_score + log_mrs,
              data = dec_sent, family = "binomial")
  
-fit.e <- glm(paper_rejected ~ first_auth_geog + HDI10 + mean_review_score + log_hdi10 + log_mrs,
+fit.e <- glm(paper_rejected ~ first_auth_geog + HDI_100 + mean_review_score + log_hdi100 + log_mrs,
              data = dec_sent, family = "binomial")
 
-fit.f <- glm(paper_rejected ~ first_auth_geog + english + HDI10 + mean_review_score + log_hdi10 + log_mrs,
+fit.f <- glm(paper_rejected ~ first_auth_geog + english + HDI_100 +
+                     mean_review_score + log_hdi10 + log_mrs,
              data = dec_sent, family = "binomial")
 
 summary(fit.a) # no violation
@@ -336,7 +355,7 @@ summary(fit.d) # no violation
 summary(fit.e) # no violation
 summary(fit.f) # no violation
 
-rm(fit.chi, chi.df, chisq.prob, dec_sent)
+rm(dec_sent)
 rm(fit.1, fit.2, fit.3, fit.4, fit.5, fit.6, fit.7, fit.8)
 rm(chi_compare, roc_curve)
 rm(fit.a, fit.b, fit.c, fit.d, fit.e, fit.f)
