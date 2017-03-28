@@ -32,34 +32,27 @@ fit.1 <- glm(sent_for_review ~ first_auth_geog,
              data = dec0, family = "binomial")
 fit.2 <- glm(sent_for_review ~ first_auth_geog + english,
              data = dec0, family = "binomial")
-fit.3 <- glm(sent_for_review ~ first_auth_geog + HDI_10,
+fit.3 <- glm(sent_for_review ~ first_auth_geog + HDI_100,
              data = dec0, family = "binomial")
-fit.4 <- glm(sent_for_review ~ first_auth_geog + english + HDI_10,
+fit.4 <- glm(sent_for_review ~ first_auth_geog + english + HDI_100,
              data = dec0, family = "binomial")
 
 summary(fit.1)
+Anova(fit.1)
+
 summary(fit.2)
+Anova(fit.2)
+
 summary(fit.3)
+Anova(fit.3)
+
 summary(fit.4)
+Anova(fit.4)
 
 round(exp(cbind(OR = coef(fit.1), confint(fit.1))), 3)
 round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
 round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)
 round(exp(cbind(OR = coef(fit.4), confint(fit.4))), 3)
-
-plot(HDI_100 ~ sent_for_review, data = dec0)
-plot(HDI_sd ~ sent_for_review, data = dec0)
-plot(HDI_100 ~ sent_for_review, data = dec0)
-
-function(x) {
-        factor(x, levels = names(sort(table(x), decreasing = TRUE)))
-}
-
-p <- ggplot(dec0, aes(x = reorder_size(first_auth_geog), y = HDI_10, fill = sent_for_review))
-p + geom_boxplot()
-
-p <- ggplot(dec0, aes(x = first_auth_geog, y = HDI_10, fill = sent_for_review))
-p + geom_boxplot()
 
 # Investigate ROC curve ; be sure to substitute "sent_for_review" out if using
 # in other functions
@@ -76,21 +69,7 @@ roc_curve(fit.2, dec0)
 roc_curve(fit.3, dec0)
 roc_curve(fit.4, dec0)
 
-# Test the overall effect of the levels
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 1)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 2)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 3)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 4)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 5)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 6)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 7)
-wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 2:7)
-
-# Test the model
-Anova(fit.1)
-Anova(fit.2)
-Anova(fit.3)
-Anova(fit.4)
+# Compare models
 
 chi_compare(fit.1, fit.2)
 chi_compare(fit.1, fit.3)
@@ -105,7 +84,7 @@ fit.6 <- glm(sent_for_review ~ first_auth_geog + english + HDI_100 + log_hdi100,
 summary(fit.5)
 summary(fit.6)
 
-rm(dec0, fit.1, fit.2, fit.3, fit.4, fit.5, fit.6, roc_curve)
+rm(dec0, fit.1, fit.2, fit.3, fit.4, roc_curve)
 
 # RESTART R TO AVOID PACKAGE CONFLICTS
 # Build models for mean review score
@@ -151,9 +130,13 @@ fit.3 <- polr(mean.rs ~ first_auth_geog + HDI_100, data = dec_score, Hess = TRUE
 fit.4 <- polr(mean.rs ~ first_auth_geog + english + HDI_100, data = dec_score, Hess = TRUE)
 
 summary(fit.1, digits = 3)
+Anova(fit.1)
 summary(fit.2, digits = 3)
+Anova(fit.2)
 summary(fit.3, digits = 3)
+Anova(fit.3)
 summary(fit.4, digits = 3)
+Anova(fit.4)
 
 (ctable1 <- coef(summary(fit.1)))
 (ctable2 <- coef(summary(fit.2)))
@@ -185,15 +168,9 @@ round(exp(cbind(OR = coef(fit.2), ci2)), 3)
 round(exp(cbind(OR = coef(fit.3), ci3)), 3)
 round(exp(cbind(OR = coef(fit.4), ci4)), 3)
 
-Anova(fit.1)
-Anova(fit.2)
-Anova(fit.3)
-Anova(fit.4)
-
 chi_compare(fit.1, fit.2) # sig = yes
 chi_compare(fit.1, fit.3) # sig = no
 chi_compare(fit.1, fit.4) # sig = yes
-chi_compare(fit.2, fit.4) # sig = no
 
 rm(ci1, ci2, ci3, ci4)
 rm(ctable1, ctable2, ctable3, ctable4)
@@ -306,12 +283,25 @@ Anova(fit.7)
 Anova(fit.8)
 
 chi_compare(fit.1, fit.2)
+anova(fit.1, fit.2)
+
 chi_compare(fit.1, fit.3)
+anova(fit.1, fit.3)
+
 chi_compare(fit.1, fit.4)
+anova(fit.1, fit.4)
+
 chi_compare(fit.1, fit.5)
+anova(fit.1, fit.5)
+
 chi_compare(fit.1, fit.6)
+anova(fit.1, fit.6)
+
 chi_compare(fit.1, fit.7)
+anova(fit.1, fit.7)
+
 chi_compare(fit.1, fit.8)
+anova(fit.1, fit.8)
 
 # no sig diff
 chi_compare(fit.4, fit.6)
