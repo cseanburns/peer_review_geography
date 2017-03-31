@@ -74,7 +74,6 @@ roc_curve(fit.4, dec0)
 chi_compare(fit.1, fit.2)
 chi_compare(fit.1, fit.3)
 chi_compare(fit.1, fit.4)
-chi_compare(fit.3, fit.4)
 
 # Test linearity of the logit
 dec0$log_hdi100 <- log(dec0$HDI_100) * dec0$HDI_100
@@ -131,10 +130,13 @@ fit.4 <- polr(mean.rs ~ first_auth_geog + english + HDI_100, data = dec_score, H
 
 summary(fit.1, digits = 3)
 Anova(fit.1)
+
 summary(fit.2, digits = 3)
 Anova(fit.2)
+
 summary(fit.3, digits = 3)
 Anova(fit.3)
+
 summary(fit.4, digits = 3)
 Anova(fit.4)
 
@@ -262,17 +264,6 @@ round(exp(cbind(OR = coef(fit.8), confint(fit.8))), 3)
 # Test the overall effect of the levels
 wald.test(b = coef(fit.1), Sigma = vcov(fit.1), Terms = 2:7)
 
-# The reduction in the deviance; results in the chi square statistic
-fit.chi     <- fit.1$null.deviance - fit.1$deviance
-# The degrees of freedom for the chi square statistic
-chi.df      <- fit.1$df.null - fit.1$df.residual
-# The probability associated with the chi-square statistic
-# If (e.g.) less than 0.05, we can reject the null hypothesis that the model
-# is not better than chance at predicting the outcome
-chisq.prob  <- 1 - pchisq(fit.chi, chi.df) 
-# display the results
-fit.chi ; chi.df ; chisq.prob
-
 Anova(fit.1)
 Anova(fit.2)
 Anova(fit.3)
@@ -302,19 +293,6 @@ anova(fit.1, fit.7)
 
 chi_compare(fit.1, fit.8)
 anova(fit.1, fit.8)
-
-# no sig diff
-chi_compare(fit.4, fit.6)
-chi_compare(fit.4, fit.7)
-chi_compare(fit.4, fit.8)
-
-# 7 > 6 but no sig dif between 6,8 
-chi_compare(fit.6, fit.7)
-chi_compare(fit.6, fit.8)
-
-# no sig diff
-chi_compare(fit.7, fit.6)
-chi_compare(fit.7, fit.8)
 
 # linearity of the logit assumption test
 dec_sent$log_hdi100 <- log(dec_sent$HDI_100) * dec_sent$HDI_100
