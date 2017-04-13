@@ -7,8 +7,6 @@ rm(reviewer_data_by_paper)
 
 table(rev_dec$reviewer_region)
 
-rev_dec$reviewer_region <- rev_dec$regions
-
 rev_dec$reviewer_region <- gsub("AustandNZ", "Oceania",
                                 rev_dec$reviewer_region)
 rev_dec$reviewer_region <- gsub("EasternAsia", "Asia",
