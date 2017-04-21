@@ -1,7 +1,7 @@
 I am collaborating on a project investigating peer review and geographical and 
 language bias for submissions to an ecology journal.
 
-The files in this repository, numbered s[0-6]---.R, include the source code for 
+The files in this repository, numbered s[0-8]---.R, include the source code for 
 the analysis. They may also include some exploratory code, including plots, that
 will not be reported in the final paper.
 
