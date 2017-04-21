@@ -1,18 +1,5 @@
 source('libraries.R')
 
-# Set up for comparing models
-chi_compare <- function(model.1, model.2) {
-       models.chi <- model.1$deviance - model.2$deviance
-       models.df  <- model.1$df.residual - model.2$df.residual
-       chi.prob   <- 1 - pchisq(models.chi, models.df)
-       cat("models.chi is", models.chi, "\n")
-       cat("models.df is", models.df, "\n")
-       cat("chi.prob is", chi.prob, "\n")
-       cat("If chi.prob is less than 0.05, then the second model is a signifcant improvement over the first model", "\n")
-       cat("If applicable, then the second model is", exp((model.1$aic - model.2$aic)/2), "\n")
-           cat("times as probable as the first model, minimizing information loss.")
-}
-
 # Sent for Review ; looking at desk rejects in this section
 dec0                 <- select(dec, sent_for_review, first_auth_geog, english, HDI)
 dec0                 <- dec0[complete.cases(dec0),]
@@ -49,6 +36,11 @@ Anova(fit.3)
 summary(fit.4)
 Anova(fit.4)
 
+# Compare models
+anova(fit.1, fit.2, test="LRT")
+anova(fit.1, fit.3, test="LRT")
+anova(fit.1, fit.4, test="LRT")
+
 round(exp(cbind(OR = coef(fit.1), confint(fit.1))), 3)
 round(exp(cbind(OR = coef(fit.2), confint(fit.2))), 3)
 round(exp(cbind(OR = coef(fit.3), confint(fit.3))), 3)
@@ -68,12 +60,6 @@ roc_curve(fit.1, dec0)
 roc_curve(fit.2, dec0)
 roc_curve(fit.3, dec0)
 roc_curve(fit.4, dec0)
-
-# Compare models
-
-chi_compare(fit.1, fit.2)
-chi_compare(fit.1, fit.3)
-chi_compare(fit.1, fit.4)
 
 # Test linearity of the logit
 dec0$log_hdi100 <- log(dec0$HDI_100) * dec0$HDI_100
@@ -139,6 +125,11 @@ Anova(fit.3)
 
 summary(fit.4, digits = 3)
 Anova(fit.4)
+
+# Compare models
+anova(fit.1, fit.2, test="Chisq")
+anova(fit.1, fit.3, test="Chisq")
+anova(fit.1, fit.4, test="Chisq")
 
 (ctable1 <- coef(summary(fit.1)))
 (ctable2 <- coef(summary(fit.2)))
@@ -273,26 +264,14 @@ Anova(fit.6)
 Anova(fit.7)
 Anova(fit.8)
 
-chi_compare(fit.1, fit.2)
-anova(fit.1, fit.2)
-
-chi_compare(fit.1, fit.3)
-anova(fit.1, fit.3)
-
-chi_compare(fit.1, fit.4)
-anova(fit.1, fit.4)
-
-chi_compare(fit.1, fit.5)
-anova(fit.1, fit.5)
-
-chi_compare(fit.1, fit.6)
-anova(fit.1, fit.6)
-
-chi_compare(fit.1, fit.7)
-anova(fit.1, fit.7)
-
-chi_compare(fit.1, fit.8)
-anova(fit.1, fit.8)
+# Compare models
+anova(fit.1, fit.2, test="LRT")
+anova(fit.1, fit.3, test="LRT")
+anova(fit.1, fit.4, test="LRT")
+anova(fit.1, fit.5, test="LRT")
+anova(fit.1, fit.6, test="LRT")
+anova(fit.1, fit.7, test="LRT")
+anova(fit.1, fit.8, test="LRT")
 
 # linearity of the logit assumption test
 dec_sent$log_hdi100 <- log(dec_sent$HDI_100) * dec_sent$HDI_100
