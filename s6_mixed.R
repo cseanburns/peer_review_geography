@@ -11,7 +11,7 @@ dec0 <- dec %>% filter(author_count > 1)
 # test differences on sent for review, on mixed authorship, and then on sent
 # for review + mixed authorship
 table(dec0$sent_for_review)
-round(table(dec0$sent_for_review) / sum(table(dec0$sent_for_review)))
+round(table(dec0$sent_for_review) / sum(table(dec0$sent_for_review)), 3)
 chisq.test(table(dec0$sent_for_review), p = c(0.50, 0.50))
 
 table(dec0$mixed)
