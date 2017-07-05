@@ -19,6 +19,7 @@ summary(fit.0)
 
 round(exp(cbind(OR = coef(fit.0), confint(fit.0))), 3)
 
+library("lsmeans")
 fit.0.ls <- lsmeans(fit.0, "first_auth_geog")
 plot(fit.0.ls, xlab = "Least-Squares Means", ylab = "First Author Geography",
      main = "For Papers Sent for Review")
