@@ -1,9 +1,9 @@
 source("libraries.R")
 
-## mixed = FALSE, means that authors are located in same country
-## mixed = TRUE, means that authors are located in different countries
+## mixed = FALSE, means that authors are located in same country/geographic region
+## mixed = TRUE, means that authors are located in different countries/geogrpahic regions
 
-### test if multinational authorships are penalized for sent for review###
+### test if multinational authorships are penalized for sent for review ###
 
 # Exclude single authors
 dec0 <- dec %>% filter(author_count > 1)
@@ -17,6 +17,10 @@ chisq.test(table(dec0$sent_for_review), p = c(0.50, 0.50))
 table(dec0$mixed_nation)
 round(table(dec0$mixed_nation) / sum(table(dec0$mixed_nation)), 2)
 chisq.test(table(dec0$mixed_nation))
+
+table(dec0$mixed_geo)
+round(table(dec0$mixed_geo) / sum(table(dec0$mixed_geo)), 2)
+chisq.test(table(dec0$mixed_geo))
 
 # test mixed nation
 table(dec0$sent_for_review, dec0$mixed_nation)
