@@ -117,16 +117,49 @@ auth_tmp <- select(auth_tmp, ms_id, author_country, author_order)
 
 auth_tmp <- auth_tmp %>% select(ms_id, author_country)
 auth_tmp <- distinct(auth_tmp)
-auth_tmp$mixed <- duplicated(auth_tmp$ms_id)
+auth_tmp$mixed_nation <- duplicated(auth_tmp$ms_id)
 
 # note that FALSE for dec$mixed means all authors are from the same country
 # note that TRUE for dec$mixed means authors are from separate countries
 
-mixed.true  <- auth_tmp %>% filter(mixed == TRUE)
-mixed.false <- auth_tmp %>% filter(mixed == FALSE)
+mixed.true  <- auth_tmp %>% filter(mixed_nation == TRUE)
+mixed.false <- auth_tmp %>% filter(mixed_nation == FALSE)
 
 mixed.true$author_country  <- NULL
 mixed.false$author_country <- NULL
+
+mixed.false.logic <- mixed.false[!(mixed.false$ms_id %in% mixed.true$ms_id),]
+mixed.combined    <- rbind(mixed.true, mixed.false.logic)
+mixed.combined    <- unique(mixed.combined)
+
+auth_tmp <- inner_join(mixed.combined, dec, by="ms_id")
+auth_tmp <- auth_tmp %>% arrange(ms_id)
+
+dec <- auth_tmp
+
+rm(auth_tmp, mixed.true, mixed.false, mixed.false.logic, mixed.combined)
+
+# get counts of authors per paper; and create variable noting whether authors
+# are from different geographic regions or the same geographic region
+  
+auth_tmp <- author_decisions %>% select(ms_id, author_country,
+                                   geographic_region, language, author_order)
+auth_tmp <- auth_tmp %>% arrange(ms_id, author_order)
+
+auth_tmp <- select(auth_tmp, ms_id, geographic_region, author_order)
+
+auth_tmp <- auth_tmp %>% select(ms_id, geographic_region)
+auth_tmp <- distinct(auth_tmp)
+auth_tmp$mixed_geo <- duplicated(auth_tmp$ms_id)
+
+# note that FALSE for dec$mixed means all authors are from the same geo region
+# note that TRUE for dec$mixed means authors are from separate geo regions
+
+mixed.true  <- auth_tmp %>% filter(mixed_geo == TRUE)
+mixed.false <- auth_tmp %>% filter(mixed_geo == FALSE)
+
+mixed.true$geographic_region <- NULL
+mixed.false$geographic_region <- NULL
 
 mixed.false.logic <- mixed.false[!(mixed.false$ms_id %in% mixed.true$ms_id),]
 mixed.combined    <- rbind(mixed.true, mixed.false.logic)

@@ -14,16 +14,25 @@ table(dec0$sent_for_review)
 round(table(dec0$sent_for_review) / sum(table(dec0$sent_for_review)), 3)
 chisq.test(table(dec0$sent_for_review), p = c(0.50, 0.50))
 
-table(dec0$mixed)
-round(table(dec0$mixed) / sum(table(dec0$mixed)), 2)
-chisq.test(table(dec0$mixed))
+table(dec0$mixed_nation)
+round(table(dec0$mixed_nation) / sum(table(dec0$mixed_nation)), 2)
+chisq.test(table(dec0$mixed_nation))
 
-table(dec0$sent_for_review, dec0$mixed)
-round(table(dec0$sent_for_review, dec0$mixed) /
-              sum(table(dec0$sent_for_review, dec0$mixed)), 2)
-chisq.test(table(dec0$sent_for_review, dec0$mixed))
+# test mixed nation
+table(dec0$sent_for_review, dec0$mixed_nation)
+round(table(dec0$sent_for_review, dec0$mixed_nation) /
+              sum(table(dec0$sent_for_review, dec0$mixed_nation)), 2)
+chisq.test(table(dec0$sent_for_review, dec0$mixed_nation))
 
-plot(dec0$sent_for_review ~ dec0$mixed)
+plot(dec0$sent_for_review ~ dec0$mixed_nation)
+
+# test mixed geographic region
+table(dec0$sent_for_review, dec0$mixed_geo)
+round(table(dec0$sent_for_review, dec0$mixed_geo) /
+              sum(table(dec0$sent_for_review, dec0$mixed_geo)), 2)
+chisq.test(table(dec0$sent_for_review, dec0$mixed_geo))
+
+plot(dec0$sent_for_review ~ dec0$mixed_geo)
 
 rm(dec0)
 
@@ -36,12 +45,18 @@ dec1 <- dec %>% filter(sent_for_review == "Yes" & author_count > 1)
 table(dec1$paper_rejected)
 chisq.test(table(dec1$paper_rejected))
 
-table(dec1$mixed)
-chisq.test(table(dec1$mixed))
+table(dec1$mixed_nation)
+chisq.test(table(dec1$mixed_nation))
 
-table(dec1$paper_rejected, dec1$mixed)
-chisq.test(table(dec1$paper_rejected, dec1$mixed))
+# test for national location
+table(dec1$paper_rejected, dec1$mixed_nation)
+chisq.test(table(dec1$paper_rejected, dec1$mixed_nation))
 
-plot(dec1$paper_rejected ~ dec1$mixed)
+plot(dec1$paper_rejected ~ dec1$mixed_nation)
 
+# test for geographic regions
+table(dec1$paper_rejected, dec1$mixed_geo)
+chisq.test(table(dec1$paper_rejected, dec1$mixed_geo))
+
+plot(dec1$paper_rejected ~ dec1$mixed_geo)
 rm(dec1)
