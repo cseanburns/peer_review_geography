@@ -1,13 +1,18 @@
-I am collaborating on a project investigating peer review and geographical and 
-language bias for submissions to an ecology journal.
+I collaborated on a project that investigated peer review and geographical and 
+language bias for submissions to an ecology journal. The results are published 
+in the following article:
+
+Burns, C.S., & Fox, C.W. (2017). Language and socioeconomics predict geographic 
+variation in peer review outcomes at an ecology journal. *Scientometrics, 
+113*(2), 1113-1127. doi:http://doi.org/10.1007/s11192-017-2517-5
+
+Dryad, data, doi: http://doi.org/10.5061/dryad.5090r
+
+# Data notes
 
 The files in this repository, numbered s[0-8]---.R, include the source code for 
 the analysis. They may also include some exploratory code, including plots, that
-will not be reported in the final paper.
-
-The data may be uploaded here at a future time.
-
-# Data notes
+may not be reported in the final paper.
 
 ## Data files: decisions.csv and decisions_2.csv
 
